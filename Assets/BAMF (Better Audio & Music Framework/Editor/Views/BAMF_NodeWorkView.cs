@@ -102,6 +102,9 @@ public class BAMF_NodeWorkView : BAMF_ViewBase {
 				menu.AddItem (new GUIContent ("Unload Current Graph"), false, ContextCallback, "2");
 
 				menu.AddSeparator ("");
+				menu.AddItem (new GUIContent ("Music Piece"), false, ContextCallback, "Music");
+
+				menu.AddSeparator ("");
 				menu.AddItem (new GUIContent ("Float node"), false, ContextCallback, "3");
 				menu.AddItem (new GUIContent ("Add Node"), false, ContextCallback, "4");
 			}
@@ -137,6 +140,10 @@ public class BAMF_NodeWorkView : BAMF_ViewBase {
 		case "5"://Add node
 			//
 			BAMF_NodeUtilities.DeleteNode(deleteNodeIdx, currentGraph);
+			break;
+		case "Music":
+			//
+			BAMF_NodeUtilities.CreateNode(currentGraph, NodeType.Music, mousePos);
 			break;
 		default:
 			//

@@ -62,6 +62,12 @@ public static class BAMF_NodeUtilities {
 				currentNode = ScriptableObject.CreateInstance<BAMF_AddNode> () as BAMF_AddNode;
 				currentNode.nodeName = nodeType.ToString () + " Node";
 				break;
+			case NodeType.Music:
+				//
+				currentNode = ScriptableObject.CreateInstance<BAMF_MusicNode> () as BAMF_MusicNode;
+				//currentNode.nodeName = nodeType.ToString () + " Node";
+				currentNode.nodeName = "M U S I C  P I E C E"; 
+				break;
 			default: 
 				//
 				break;
@@ -93,9 +99,11 @@ public static class BAMF_NodeUtilities {
 								+ ", which has " + deleteNode.outputs [i].connectedNode.inputs.Count 
 								+ " inputs in total."); */
 						//Debug.Log ("connected node has "+deleteNode.outputs[i].connectedNode+" outputs!");
-						deleteNode.outputs [i].connectedNode.inputs [deleteNode.outputs [i].connectedNodeInputID].isOccupied = false;
-						deleteNode.outputs [i].connectedNode.inputs [deleteNode.outputs [i].connectedNodeInputID].connectedNode = null;
-						deleteNode.outputs [i].connectedNode.inputs [deleteNode.outputs [i].connectedNodeInputID].connectedNodeOutputID = new int(); 
+						if (deleteNode.outputs [i].connectedNode != null) {
+							deleteNode.outputs [i].connectedNode.inputs [deleteNode.outputs [i].connectedNodeInputID].isOccupied = false;
+							deleteNode.outputs [i].connectedNode.inputs [deleteNode.outputs [i].connectedNodeInputID].connectedNode = null;
+							deleteNode.outputs [i].connectedNode.inputs [deleteNode.outputs [i].connectedNodeInputID].connectedNodeOutputID = new int (); 
+						}
 					}
 					currentGraph.nodes.RemoveAt (deleteNodeIdx);
 					GameObject.DestroyImmediate (deleteNode, true);

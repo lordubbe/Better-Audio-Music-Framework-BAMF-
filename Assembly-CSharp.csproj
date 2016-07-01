@@ -45,10 +45,11 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-     <Compile Include="Assets\BAMF (Better Audio &amp; Music Framework\Scripts\Data\BAMF_AddNode.cs" />
-     <Compile Include="Assets\BAMF (Better Audio &amp; Music Framework\Scripts\Data\BAMF_FloatNode.cs" />
      <Compile Include="Assets\BAMF (Better Audio &amp; Music Framework\Scripts\Data\BAMF_NodeEnums.cs" />
      <Compile Include="Assets\BAMF (Better Audio &amp; Music Framework\Scripts\Data\BAMF_NodeGraph.cs" />
+     <Compile Include="Assets\BAMF (Better Audio &amp; Music Framework\Scripts\Data\Nodes\BAMF_AddNode.cs" />
+     <Compile Include="Assets\BAMF (Better Audio &amp; Music Framework\Scripts\Data\Nodes\BAMF_FloatNode.cs" />
+     <Compile Include="Assets\BAMF (Better Audio &amp; Music Framework\Scripts\Data\Nodes\BAMF_MusicNode.cs" />
      <Compile Include="Assets\BAMF (Better Audio &amp; Music Framework\Scripts\Data\Nodes\BAMF_NodeBase.cs" />
  <Reference Include="UnityEngine.UI">
  <HintPath>/Applications/Unity/Unity.app/Contents/UnityExtensions/Unity/GUISystem/UnityEngine.UI.dll</HintPath>

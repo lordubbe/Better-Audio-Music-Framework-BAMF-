@@ -2,7 +2,7 @@
 using System.Collections;
 
 public enum NodeType{
-	Float, Add
+	Float, Add, Music
 }
 
 public enum NodeConnectionType{

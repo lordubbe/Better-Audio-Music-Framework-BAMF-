@@ -11,6 +11,7 @@ public class BAMF_NodeBase : ScriptableObject {//want it to be attached to an as
 	public bool isSelected = false;
 	public string nodeName;
 	public Rect nodeRect;
+	public Rect contentRect;
 	public NodeType nodeType;
 	public BAMF_NodeGraph parentGraph;
 
@@ -32,7 +33,7 @@ public class BAMF_NodeBase : ScriptableObject {//want it to be attached to an as
 
 	#region main methods
 	public virtual void InitNode(){
-		
+		contentRect = new Rect ();
 	}
 
 	public virtual void UpdateNode(Event e, Rect viewRect){
@@ -47,6 +48,9 @@ public class BAMF_NodeBase : ScriptableObject {//want it to be attached to an as
 		} else {
 			GUI.Box (nodeRect, nodeName, viewSkin.GetStyle ("NodeDefault"));
 		}
+		contentRect.x = nodeRect.x  +5f; contentRect.y = nodeRect.y + 25f; 
+		contentRect.width = nodeRect.width - 10f; contentRect.height = nodeRect.height - (25f + 5f);
+		GUI.Box (contentRect, "", viewSkin.GetStyle ("NodeContent"));
 
 		DrawConnections ();
 
