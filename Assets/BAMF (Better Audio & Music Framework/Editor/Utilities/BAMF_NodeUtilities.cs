@@ -87,8 +87,15 @@ public static class BAMF_NodeUtilities {
 				BAMF_NodeBase deleteNode = currentGraph.nodes [deleteNodeIdx];
 				if (deleteNode != null) {
 					for(int i=0; i<deleteNode.outputs.Count; i++){
+					/*	Debug.Log ("deleting " + deleteNode.nodeName 
+								+ " from input " + deleteNode.outputs [i].connectedNodeInputID 
+								+ " of " + deleteNode.outputs [i].connectedNode.nodeName 	//!!!!!!!!!
+								+ ", which has " + deleteNode.outputs [i].connectedNode.inputs.Count 
+								+ " inputs in total."); */
+						//Debug.Log ("connected node has "+deleteNode.outputs[i].connectedNode+" outputs!");
 						deleteNode.outputs [i].connectedNode.inputs [deleteNode.outputs [i].connectedNodeInputID].isOccupied = false;
-						deleteNode.outputs [i].connectedNode.inputs [deleteNode.outputs [i].connectedNodeInputID].connectedOutput = null;
+						deleteNode.outputs [i].connectedNode.inputs [deleteNode.outputs [i].connectedNodeInputID].connectedNode = null;
+						deleteNode.outputs [i].connectedNode.inputs [deleteNode.outputs [i].connectedNodeInputID].connectedNodeOutputID = new int(); 
 					}
 					currentGraph.nodes.RemoveAt (deleteNodeIdx);
 					GameObject.DestroyImmediate (deleteNode, true);

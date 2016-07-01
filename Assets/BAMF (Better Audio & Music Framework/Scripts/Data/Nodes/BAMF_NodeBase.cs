@@ -24,12 +24,15 @@ public class BAMF_NodeBase : ScriptableObject {//want it to be attached to an as
 	protected GUISkin nodeSkin;
 	#endregion
 
-	#region main methods
-	public virtual void InitNode(){
+	public BAMF_NodeBase(){
 		inputs = new List<BAMF_NodeInput>();
 		outputs = new List<BAMF_NodeOutput>();
+		bezierTex = Resources.Load ("Textures/Editor/bezierCurve") as Texture2D; //TODO: move to nodebase 
+	}
 
-		bezierTex = Resources.Load ("Textures/Editor/bezierCurve") as Texture2D; //TODO: move to nodebase
+	#region main methods
+	public virtual void InitNode(){
+		
 	}
 
 	public virtual void UpdateNode(Event e, Rect viewRect){
@@ -81,11 +84,11 @@ public class BAMF_NodeBase : ScriptableObject {//want it to be attached to an as
 		Handles.BeginGUI ();
 		if (inputs.Count > 0) {
 			for (int i = 0; i < inputs.Count; i++) {
-				if (inputs [i].isOccupied && inputs [i].connectedOutput != null) {
-					Vector3 startPos = new Vector3 (inputs [i].connectedOutput.outputRect.x + inputs [i].connectedOutput.outputRect.width, inputs [i].connectedOutput.outputRect.y + inputs [i].connectedOutput.outputRect.height / 2, 0);
-					Vector3 endPos = new Vector3 (inputs[i].inputRect.x, inputs[i].inputRect.y+9f, 0);
+				if (inputs [i].isOccupied && inputs [i].connectedNode.outputs [inputs [i].connectedNodeOutputID] != null) {
+					Vector3 startPos = new Vector3 (inputs [i].connectedNode.outputs [inputs [i].connectedNodeOutputID].outputRect.x + inputs [i].connectedNode.outputs [inputs [i].connectedNodeOutputID].outputRect.width, inputs [i].connectedNode.outputs [inputs [i].connectedNodeOutputID].outputRect.y + inputs [i].connectedNode.outputs [inputs [i].connectedNodeOutputID].outputRect.height / 2, 0);
+					Vector3 endPos = new Vector3 (inputs [i].inputRect.x, inputs [i].inputRect.y + 9f, 0);
 					Handles.DrawBezier (startPos, endPos, 
-						startPos + Vector3.right * 50, endPos + Vector3.left * 50, inputs[i].typeColor, bezierTex != null ? bezierTex : null, 3f);
+						startPos + Vector3.right * 50, endPos + Vector3.left * 50, inputs [i].typeColor, bezierTex != null ? bezierTex : null, 3f);
 				} else {
 					inputs [i].isOccupied = false;
 				}
@@ -100,7 +103,10 @@ public class BAMF_NodeBase : ScriptableObject {//want it to be attached to an as
 	[System.Serializable]
 	public class BAMF_NodeInput{
 		public bool isOccupied = false;
-		public BAMF_NodeOutput connectedOutput = null;
+
+		public BAMF_NodeBase connectedNode = null;
+		public int connectedNodeOutputID;
+
 		public NodeConnectionType type;
 		public Rect inputRect;
 		public Color typeColor;

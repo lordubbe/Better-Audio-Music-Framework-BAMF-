@@ -10,7 +10,7 @@ public class BAMF_AddNode : BAMF_NodeBase {
 //	public BAMF_NodeOutput output;
 //	public BAMF_NodeInput inputA;
 //	public BAMF_NodeInput inputB;
-
+	bool ranInit = false;
 	#endregion
 
 	public BAMF_AddNode(){
@@ -30,6 +30,7 @@ public class BAMF_AddNode : BAMF_NodeBase {
 		outputs.Add (new BAMF_NodeOutput(NodeConnectionType.Float));
 		inputs.Add (new BAMF_NodeInput (NodeConnectionType.Float));
 		inputs.Add (new BAMF_NodeInput (NodeConnectionType.Add));
+		ranInit = true;
 	}
 
 	public override void UpdateNode (Event e, Rect viewRect)
@@ -40,23 +41,26 @@ public class BAMF_AddNode : BAMF_NodeBase {
 	#if UNITY_EDITOR
 	public override void UpdateNodeGUI (Event e, Rect viewRect, GUISkin viewSkin)
 	{
-		base.UpdateNodeGUI (e, viewRect, viewSkin);
-		outputs[0].outputRect = new Rect (nodeRect.x + nodeRect.width, nodeRect.y + (nodeRect.height / 2f) - 9f, 16f, 16f);
-		inputs[0].inputRect = new Rect (nodeRect.x - 16f, nodeRect.y + (nodeRect.height / 3f) - 9f, 16f, 16f);
-		inputs[1].inputRect = new Rect (nodeRect.x - 16f, nodeRect.y + (nodeRect.height / 3f) * 2 - 9f, 16f, 16f);
+		if (ranInit) {
+			base.UpdateNodeGUI (e, viewRect, viewSkin);
+			outputs [0].outputRect = new Rect (nodeRect.x + nodeRect.width, nodeRect.y + (nodeRect.height / 2f) - 9f, 16f, 16f); 
+			inputs [0].inputRect = new Rect (nodeRect.x - 16f, nodeRect.y + (nodeRect.height / 3f) - 9f, 16f, 16f);
+			inputs [1].inputRect = new Rect (nodeRect.x - 16f, nodeRect.y + (nodeRect.height / 3f) * 2 - 9f, 16f, 16f);
 
-		if (GUI.RepeatButton (outputs[0].outputRect, "", viewSkin.GetStyle("NodeInput_"+outputs[0].type.ToString()))) { //output
-			//
-			if (parentGraph != null) {
-				parentGraph.connectionMode = true;
-				parentGraph.clickedOutput = this.outputs[0];
-				this.outputs[0].isClicked = true;
+			if (GUI.RepeatButton (outputs [0].outputRect, "", viewSkin.GetStyle ("NodeInput_" + outputs [0].type.ToString ()))) { //output
+				//
+				if (parentGraph != null) {
+					parentGraph.connectionMode = true;
+					parentGraph.clickedNode = this;
+					parentGraph.clickedNodeOutputID = 0;
+					this.outputs [0].isClicked = true;
+				}
 			}
-		}
 
-		GUI.RepeatButton (inputs[0].inputRect, "", viewSkin.GetStyle ("NodeInput_"+inputs[0].type.ToString()));//input A
-		GUI.RepeatButton (inputs[1].inputRect, "", viewSkin.GetStyle ("NodeInput_"+inputs[1].type.ToString()));//input B
-	} 
+			GUI.RepeatButton (inputs [0].inputRect, "", viewSkin.GetStyle ("NodeInput_" + inputs [0].type.ToString ()));//input A
+			GUI.RepeatButton (inputs [1].inputRect, "", viewSkin.GetStyle ("NodeInput_" + inputs [1].type.ToString ()));//input B
+			} 
+	}
 	#endif
 	#endregion
 }

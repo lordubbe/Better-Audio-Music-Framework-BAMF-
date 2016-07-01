@@ -14,7 +14,8 @@ public class BAMF_NodeGraph : ScriptableObject {
 
 	public bool selectMode = false;
 	public bool connectionMode = false;
-	public BAMF_NodeBase.BAMF_NodeOutput clickedOutput = null;
+	public BAMF_NodeBase clickedNode = null;
+	public int clickedNodeOutputID;
 
 	public Texture2D bezierTex;
 	#endregion
@@ -54,7 +55,7 @@ public class BAMF_NodeGraph : ScriptableObject {
 
 		//if in connectionmode
 		if (connectionMode) {
-			if (clickedOutput != null) {
+			if (clickedNode != null) {
 				DrawConnectionToMouse (e.mousePosition);
 			}
 		}
@@ -83,23 +84,32 @@ public class BAMF_NodeGraph : ScriptableObject {
 
 					for (int i = 0; i < nodes.Count; i++) {//check if over input
 						for (int k = 0; k < nodes [i].inputs.Count; k++) {
-							if (nodes [i].inputs [k].inputRect.Contains (e.mousePosition)) {//if mouse down is over a input node
+							if (nodes [i].inputs [k].inputRect.Contains (e.mousePosition)) {//if mouse down is over an input node (ONLY MOUSE DOWN) TODO: FIX NEW STUFF FOR MOUSE UP
 								if (connectionMode) {
-									if (clickedOutput.type == nodes [i].inputs [k].type) {
-										nodes [i].inputs [k].connectedOutput = clickedOutput;
-										nodes [i].inputs [k].isOccupied = nodes [i].inputs [k].connectedOutput != null ? true : false;
+									if (clickedNode.outputs[clickedNodeOutputID].type == nodes [i].inputs [k].type) {
+										nodes [i].inputs [k].connectedNode = clickedNode;
+										nodes [i].inputs [k].connectedNodeOutputID = clickedNodeOutputID;
+										nodes [i].inputs [k].isOccupied = nodes [i].inputs [k].connectedNode != null ? true : false;
 										connectionMode = false;
-										clickedOutput.isClicked = false;
-										nodes [i].inputs [k].connectedOutput.isClicked = false;
-										clickedOutput = null;
+
+										//assign stuff from the output node
+										nodes [i].inputs [k].connectedNode.outputs [nodes [i].inputs [k].connectedNodeOutputID].isClicked = false;
+										nodes [i].inputs [k].connectedNode.outputs [nodes [i].inputs [k].connectedNodeOutputID].connectedNode = nodes [i];
+										nodes [i].inputs [k].connectedNode.outputs [nodes [i].inputs [k].connectedNodeOutputID].connectedNodeInputID = k;
+										//clickedNode.outputs[clickedNodeOutputID].isClicked = false;
+										//nodes [i].inputs [k].connectedNode.outputs[clickedNodeOutputID].isClicked = false;
+										clickedNode = null;
+										clickedNodeOutputID = 0;
 									}
 								} else {
 									//
 									if (nodes [i].inputs [k].isOccupied) {
-										clickedOutput = nodes [i].inputs [k].connectedOutput;
-										clickedOutput.isClicked = true;
-										nodes [i].inputs [k].connectedOutput = null;
-										nodes [i].inputs [k].isOccupied = nodes [i].inputs [k].connectedOutput != null ? true : false;
+										clickedNode = nodes [i].inputs[k].connectedNode; //set clicked node info
+										clickedNodeOutputID = nodes [i].inputs [k].connectedNodeOutputID; //set clicked node output idx info
+										clickedNode.outputs [clickedNodeOutputID].isClicked = true; // set the output of the clicked node to isClicked
+										nodes [i].inputs [k].connectedNode.outputs[clickedNodeOutputID].connectedNode = null;
+										nodes [i].inputs [k].connectedNode = null;
+										nodes [i].inputs [k].isOccupied = nodes [i].inputs [k].connectedNode != null ? true : false;
 										connectionMode = true;
 									}
 								}
@@ -121,19 +131,26 @@ public class BAMF_NodeGraph : ScriptableObject {
 						for (int i = 0; i < nodes.Count; i++) {//check if not over output
 							for (int k = 0; k < nodes [i].inputs.Count; k++) {
 								if (nodes [i].inputs [k].inputRect.Contains (e.mousePosition)) {//if mouse up is over a input node
-									nodes [i].inputs [k].connectedOutput = clickedOutput;
-									nodes [i].inputs [k].connectedOutput.connectedNode = nodes [i];
-									nodes [i].inputs [k].connectedOutput.connectedNodeInputID = k;
-									nodes [i].inputs [k].isOccupied = nodes [i].inputs [k].connectedOutput != null ? true : false;
-									connectionMode = false;
-									clickedOutput.isClicked = false;
-									nodes [i].inputs [k].connectedOutput.isClicked = false;
-									clickedOutput = null;
+									if (clickedNode.outputs [clickedNodeOutputID].type == nodes [i].inputs [k].type) {
+										nodes [i].inputs [k].connectedNode = clickedNode;//.outputs[clickedNodeOutputID] = clickedNode.outputs[clickedNodeOutputID];
+										nodes [i].inputs [k].connectedNodeOutputID = clickedNodeOutputID;//.outputs[clickedNodeOutputID].connectedNodeInputID = k;
+										nodes [i].inputs [k].isOccupied = nodes [i].inputs [k].connectedNode != null ? true : false;
+
+										//assign stuff from the output node
+										nodes [i].inputs [k].connectedNode.outputs [nodes [i].inputs [k].connectedNodeOutputID].isClicked = false;
+										nodes [i].inputs [k].connectedNode.outputs [nodes [i].inputs [k].connectedNodeOutputID].connectedNode = nodes [i];
+										nodes [i].inputs [k].connectedNode.outputs [nodes [i].inputs [k].connectedNodeOutputID].connectedNodeInputID = k;
+										//clickedNode.outputs[clickedNodeOutputID].isClicked = false;
+										//nodes [i].inputs [k].connectedNode.outputs[clickedNodeOutputID].isClicked = false;
+										clickedNode = null;
+										clickedNodeOutputID = 0;
+									}
 								}
 							}
 						}
 					}
-					clickedOutput = null;
+					clickedNode = null;
+
 					for (int i = 0; i < nodes.Count; i++) {
 						for (int j = 0; j < nodes [i].outputs.Count; j++) {
 							nodes [i].outputs [j].isClicked = false;
@@ -155,9 +172,9 @@ public class BAMF_NodeGraph : ScriptableObject {
 
 	void DrawConnectionToMouse(Vector2 mousePosition){
 		Handles.BeginGUI ();
-		if (clickedOutput.isClicked) {
+		if (clickedNode.outputs[clickedNodeOutputID].isClicked) {
 			Handles.color = Color.white;
-			Vector3 startPos = new Vector3 (clickedOutput.outputRect.x + clickedOutput.outputRect.width, clickedOutput.outputRect.y + clickedOutput.outputRect.height / 2, 0);
+			Vector3 startPos = new Vector3 (clickedNode.outputs[clickedNodeOutputID].outputRect.x + clickedNode.outputs[clickedNodeOutputID].outputRect.width, clickedNode.outputs[clickedNodeOutputID].outputRect.y + clickedNode.outputs[clickedNodeOutputID].outputRect.height / 2, 0);
 			Vector3 endPos = new Vector3 (mousePosition.x, mousePosition.y, 0);
 			Handles.DrawBezier (startPos, endPos, 
 				startPos + Vector3.right * 50, endPos + Vector3.left * 50, Color.white, bezierTex != null ? bezierTex : null, 3f);
