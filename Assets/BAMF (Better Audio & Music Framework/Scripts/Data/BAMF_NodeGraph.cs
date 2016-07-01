@@ -110,8 +110,6 @@ public class BAMF_NodeGraph : ScriptableObject {
 
 					if (!setNode) {
 						DeselectAllNodes ();
-						
-
 					}
 				
 //					if (connectionMode) {
@@ -124,6 +122,8 @@ public class BAMF_NodeGraph : ScriptableObject {
 							for (int k = 0; k < nodes [i].inputs.Count; k++) {
 								if (nodes [i].inputs [k].inputRect.Contains (e.mousePosition)) {//if mouse up is over a input node
 									nodes [i].inputs [k].connectedOutput = clickedOutput;
+									nodes [i].inputs [k].connectedOutput.connectedNode = nodes [i];
+									nodes [i].inputs [k].connectedOutput.connectedNodeInputID = k;
 									nodes [i].inputs [k].isOccupied = nodes [i].inputs [k].connectedOutput != null ? true : false;
 									connectionMode = false;
 									clickedOutput.isClicked = false;
@@ -134,6 +134,11 @@ public class BAMF_NodeGraph : ScriptableObject {
 						}
 					}
 					clickedOutput = null;
+					for (int i = 0; i < nodes.Count; i++) {
+						for (int j = 0; j < nodes [i].outputs.Count; j++) {
+							nodes [i].outputs [j].isClicked = false;
+						}
+					}
 					if (connectionMode) {
 						connectionMode = false;
 					}

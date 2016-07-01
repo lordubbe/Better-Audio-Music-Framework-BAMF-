@@ -30,9 +30,12 @@ public class BAMF_NodeWorkView : BAMF_ViewBase {
 			viewTitle = "No Graph";
 		}
 		GUI.Box (viewRect, viewTitle, viewSkin.GetStyle("ViewBG"));
-		BAMF_NodeUtilities.DrawGrid (viewRect, 25, .1f, Color.white);
-		BAMF_NodeUtilities.DrawGrid (viewRect, 50f, .2f, Color.white);
-
+		if (currentGraph != null) {
+			BAMF_NodeUtilities.DrawGrid (viewRect, 25, .1f, Color.white);
+			BAMF_NodeUtilities.DrawGrid (viewRect, 50f, .2f, Color.white);
+		} else {
+			//TODO: draw drag & drop screen here
+		}
 		GUILayout.BeginArea (viewRect); //actual workspace view
 
 		if (currentGraph != null) {

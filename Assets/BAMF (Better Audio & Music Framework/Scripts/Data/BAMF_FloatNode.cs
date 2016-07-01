@@ -20,6 +20,7 @@ public class BAMF_FloatNode : BAMF_NodeBase {
 		base.InitNode ();
 		nodeType = NodeType.Float;
 		nodeRect = new Rect (10f, 10f, 150f, 65f);
+		outputs.Add (output);
 	}
 
 	public override void UpdateNode (Event e, Rect viewRect)
@@ -32,7 +33,7 @@ public class BAMF_FloatNode : BAMF_NodeBase {
 	{
 		base.UpdateNodeGUI (e, viewRect, viewSkin);
 		output.outputRect = new Rect (nodeRect.x + nodeRect.width - 2f, nodeRect.y + (nodeRect.height / 2f) - 9f, 16f, 16f);
-		if(GUI.RepeatButton(output.outputRect, "", viewSkin.GetStyle("NodeOutput"))) {
+		if(GUI.RepeatButton(output.outputRect, "", viewSkin.GetStyle("NodeInput_"+output.type.ToString()))) {
 		//if (GUI.Button (new Rect (nodeRect.x + nodeRect.width -2f, nodeRect.y + (nodeRect.height / 2f) - 9f, 16f, 16f), "", viewSkin.GetStyle("NodeOutput"))) {//TODO: Maybe make REPEAT BUTTON (while held down)
 			//
 			if (parentGraph != null) {

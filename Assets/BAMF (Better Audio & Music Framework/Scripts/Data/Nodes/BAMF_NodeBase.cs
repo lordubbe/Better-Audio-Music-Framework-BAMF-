@@ -14,6 +14,8 @@ public class BAMF_NodeBase : ScriptableObject {//want it to be attached to an as
 	public NodeType nodeType;
 	public BAMF_NodeGraph parentGraph;
 
+	public Texture2D bezierTex; 
+
 	public List<BAMF_NodeInput> inputs;
 	public List<BAMF_NodeOutput> outputs;
 	#endregion
@@ -26,6 +28,8 @@ public class BAMF_NodeBase : ScriptableObject {//want it to be attached to an as
 	public virtual void InitNode(){
 		inputs = new List<BAMF_NodeInput>();
 		outputs = new List<BAMF_NodeOutput>();
+
+		bezierTex = Resources.Load ("Textures/Editor/bezierCurve") as Texture2D; //TODO: move to nodebase
 	}
 
 	public virtual void UpdateNode(Event e, Rect viewRect){
@@ -40,6 +44,8 @@ public class BAMF_NodeBase : ScriptableObject {//want it to be attached to an as
 		} else {
 			GUI.Box (nodeRect, nodeName, viewSkin.GetStyle ("NodeDefault"));
 		}
+
+		DrawConnections ();
 
 		EditorUtility.SetDirty (this);
 	}
@@ -70,6 +76,24 @@ public class BAMF_NodeBase : ScriptableObject {//want it to be attached to an as
 			}
 		}
 	}
+
+	void DrawConnections(){
+		Handles.BeginGUI ();
+		if (inputs.Count > 0) {
+			for (int i = 0; i < inputs.Count; i++) {
+				if (inputs [i].isOccupied && inputs [i].connectedOutput != null) {
+					Vector3 startPos = new Vector3 (inputs [i].connectedOutput.outputRect.x + inputs [i].connectedOutput.outputRect.width, inputs [i].connectedOutput.outputRect.y + inputs [i].connectedOutput.outputRect.height / 2, 0);
+					Vector3 endPos = new Vector3 (inputs[i].inputRect.x, inputs[i].inputRect.y+9f, 0);
+					Handles.DrawBezier (startPos, endPos, 
+						startPos + Vector3.right * 50, endPos + Vector3.left * 50, inputs[i].typeColor, bezierTex != null ? bezierTex : null, 3f);
+				} else {
+					inputs [i].isOccupied = false;
+				}
+			}
+		}
+		Handles.EndGUI ();
+	}
+
 	#endregion
 
 	#region subclasses
@@ -79,9 +103,21 @@ public class BAMF_NodeBase : ScriptableObject {//want it to be attached to an as
 		public BAMF_NodeOutput connectedOutput = null;
 		public NodeConnectionType type;
 		public Rect inputRect;
+		public Color typeColor;
 
 		public BAMF_NodeInput(NodeConnectionType t){
 			type = t;
+			switch(type){
+			case NodeConnectionType.Float:
+				typeColor = new Color(247/255f,148/255f,30/255f);
+				break;
+			case NodeConnectionType.Add:
+				typeColor = new Color(0/255f,174/255f,239/255f);
+				break;
+			default:
+				typeColor = Color.white;
+				break;
+			}
 		}
 	}
 
@@ -90,6 +126,10 @@ public class BAMF_NodeBase : ScriptableObject {//want it to be attached to an as
 		public Rect outputRect;
 		public NodeConnectionType type;
 		public bool isClicked = false;
+
+		public BAMF_NodeBase connectedNode;
+		public int connectedNodeInputID;
+
 		public BAMF_NodeOutput(NodeConnectionType t){
 			type = t;
 		}
