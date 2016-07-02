@@ -124,6 +124,9 @@ public class BAMF_NodeBase : ScriptableObject {//want it to be attached to an as
 			case NodeConnectionType.Add:
 				typeColor = new Color(0/255f,174/255f,239/255f);
 				break;
+			case NodeConnectionType.MusicClip:
+				typeColor = new Color(61/255f,247/255f,30/255f);
+				break;
 			default:
 				typeColor = Color.white;
 				break;
@@ -143,6 +146,14 @@ public class BAMF_NodeBase : ScriptableObject {//want it to be attached to an as
 		public BAMF_NodeOutput(NodeConnectionType t){
 			type = t;
 		}
+	}
+
+	public virtual List<BAMF_MusicNode.BAMF_MusicClip> GetLayers(){
+		return null;
+	}
+
+	public virtual void SetLayer(BAMF_MusicNode.BAMF_MusicClip newClip, int idx){
+
 	}
 
 	#endregion

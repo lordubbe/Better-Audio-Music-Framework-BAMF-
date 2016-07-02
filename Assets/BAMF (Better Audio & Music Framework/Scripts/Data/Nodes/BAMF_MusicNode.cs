@@ -12,9 +12,14 @@ public class BAMF_MusicNode : BAMF_NodeBase {
 	int musicBPM = 120;
 	int musicStep = 4;
 	int musicBase = 4;
+
 	//preview rect info
 	Rect previewRect;
 	Rect iconRect;
+
+	//for object picker
+	AudioClip ObjectPickerSelection = null;
+	int ObjectPickerID = 0;
 
 	public override void InitNode (){
 		base.InitNode ();
@@ -55,8 +60,15 @@ public class BAMF_MusicNode : BAMF_NodeBase {
 				this.outputs[0].isClicked = true;
 			}
 		}
+
+		//DRAW INPUTS
+		for (int i = 0; i < inputs.Count; i++) {
+			if(GUI.RepeatButton(inputs[i].inputRect, "", viewSkin.GetStyle("NodeInput_"+inputs[i].type.ToString()))) {
+			}
+		}
+
+
 		if (layers.Count > 0) {
-			Vector2 scrollpos = new Vector2 (0, 0);
 			GUILayout.BeginArea (allMusic);
 
 			// Draw all layers
@@ -70,6 +82,15 @@ public class BAMF_MusicNode : BAMF_NodeBase {
 				EditorGUI.DrawRect (thisRect, Color.black + (Color.white * 0.2f));
 				GUI.DrawTexture (thisRect, layers [i].preview);
 
+				layers [i].prevRect = thisRect;
+				layers [i].prevRect.x += nodeRect.x;
+				layers [i].prevRect.y += nodeRect.y+30;
+				layers [i].layerNumber = i;
+
+				//handle mouse events
+				e = Event.current;
+
+		
 				GUILayout.Space (thisRect.height); //make space for next layer
 			}
 
@@ -105,6 +126,7 @@ public class BAMF_MusicNode : BAMF_NodeBase {
 
 				iconRect = new Rect (info.width - (info.height - 25), 8, info.height - 45, info.height - 45);
 				GUI.DrawTexture (iconRect, Resources.Load ("Textures/Editor/icon_combat") as Texture2D);
+				handleIconClick ();
 				GUILayout.EndVertical ();
 
 				for (int i = 0; i < 5; i++) {
@@ -114,10 +136,7 @@ public class BAMF_MusicNode : BAMF_NodeBase {
 				}
 				GUILayout.EndHorizontal ();
 				GUILayout.EndArea ();
-
 			}
-
-			handleIconClick ();
 
 		} else { //user has yet to drop an Audio Clip
 			GUILayout.BeginArea (contentRect);
@@ -144,36 +163,71 @@ public class BAMF_MusicNode : BAMF_NodeBase {
 					//If the user dropped an audioclip
 					if (DragAndDrop.objectReferences [0].GetType () == typeof(AudioClip)) {
 						BAMF_MusicClip music = new BAMF_MusicClip ((AudioClip)DragAndDrop.objectReferences [0]);
-						music.clipName = music.clip.name;
-						music.postExit = music.clip.samples;
-
-						//Fetch the preview for this audioclip
-						while (music.preview == null) {//continuously try to get the preview
-							music.preview = AssetPreview.GetAssetPreview (music.clip);
-							System.Threading.Thread.Sleep (15);
-						}
-						if (music.preview != null) {
-							music.preview.filterMode = FilterMode.Point;
-						}
-						layers.Add (music);
+						AddNewLayer (music);
 					}
 
 				}
 
 				break;
+			case EventType.mouseDown:
+				EditorGUIUtility.ShowObjectPicker<AudioClip> (null, false, "", 0);
+				ObjectPickerID = EditorGUIUtility.GetObjectPickerControlID ();
+				ObjectPickerSelection = (AudioClip)EditorGUIUtility.GetObjectPickerObject ();
+				break;
 			}
+		}
+		if (Event.current.commandName == "ObjectSelectorUpdated") {
+			ObjectPickerSelection = (AudioClip)EditorGUIUtility.GetObjectPickerObject ();
+		}
+		if (Event.current.commandName == "ObjectSelectorClosed" && ObjectPickerSelection != null && EditorGUIUtility.GetObjectPickerControlID() == ObjectPickerID) {
+			//selection = (AudioClip)EditorGUIUtility.GetObjectPickerObject ();
+			BAMF_MusicClip music = new BAMF_MusicClip (ObjectPickerSelection);
+			AddNewLayer (music);
+			ObjectPickerSelection = null;
 		}
 	}
 
 	void handleIconClick(){
 		Event e = Event.current;
-		if(iconRect.Contains(e.mousePosition)){
+		if(GUILayoutUtility.GetLastRect().Contains(e.mousePosition)){
 			if(e.type == EventType.mouseDown){
 				Debug.Log("clicked icon");
 			}
 		}
 	}
 
+	public override List<BAMF_MusicClip> GetLayers ()
+	{
+		return layers;
+	}
+
+	public override void SetLayer (BAMF_MusicClip newClip, int idx)
+	{
+		layers [idx] = newClip;
+		Debug.Log ("changed Layer " + idx);
+	}
+
+
+	void AddNewLayer (BAMF_MusicClip music)
+	{
+		music.clipName = music.clip.name;
+		music.postExit = music.clip.samples;
+		music.parentNode = this;
+
+		//Fetch the preview for this audioclip
+		while (music.preview == null) {//continuously try to get the preview
+			music.preview = AssetPreview.GetAssetPreview (music.clip);
+			System.Threading.Thread.Sleep (15);
+		}
+		if (music.preview != null) {
+			music.preview.filterMode = FilterMode.Point;
+		}
+		layers.Add (music);
+		BAMF_NodeInput input = new BAMF_NodeInput (NodeConnectionType.MusicClip);
+		input.inputRect = new Rect (music.prevRect.x - 16, music.prevRect.y + (music.prevRect.height / 2 - 8), 16, 16);
+		input.inputRect.x += nodeRect.x; input.inputRect.y += nodeRect.y+(70*(layers.Count));
+		inputs.Add (input);
+	}
 	#endif
 
 	#region subclasses
@@ -182,15 +236,19 @@ public class BAMF_MusicNode : BAMF_NodeBase {
 		public AudioClip clip = null;
 		public string clipName;
 		public Texture2D preview = null;
+		public Rect prevRect;
 		public float preEntry = 0;
 		public float postExit = 0;
 		public int BPM = 120;
 		public int Step = 4;
 		public int Base = 4;
 
+		public int layerNumber;
+		public BAMF_MusicNode parentNode;
 		public BAMF_MusicClip(AudioClip c){
 			clip = c;
 		}
 	}
+
 	#endregion
 }

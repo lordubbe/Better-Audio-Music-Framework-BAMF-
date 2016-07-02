@@ -50,6 +50,7 @@
      <Compile Include="Assets\BAMF (Better Audio &amp; Music Framework\Editor\Views\BAMF_NodePropertyView.cs" />
      <Compile Include="Assets\BAMF (Better Audio &amp; Music Framework\Editor\Views\BAMF_NodeWorkView.cs" />
      <Compile Include="Assets\BAMF (Better Audio &amp; Music Framework\Editor\Views\BAMF_ViewBase.cs" />
+     <Compile Include="Assets\BAMF (Better Audio &amp; Music Framework\Editor\Windows\BAMF_MusicEditWindow.cs" />
      <Compile Include="Assets\BAMF (Better Audio &amp; Music Framework\Editor\Windows\BAMF_NodeEditorWindow.cs" />
      <Compile Include="Assets\BAMF (Better Audio &amp; Music Framework\Editor\Windows\BAMF_NodePopupWindow.cs" />
  <Reference Include="UnityEditor.Advertisements">

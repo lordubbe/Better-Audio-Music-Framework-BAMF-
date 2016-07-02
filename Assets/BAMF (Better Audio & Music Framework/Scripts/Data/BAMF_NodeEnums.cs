@@ -6,5 +6,5 @@ public enum NodeType{
 }
 
 public enum NodeConnectionType{
-	Float, Add
+	Float, Add, MusicClip
 }

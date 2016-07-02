@@ -14,6 +14,9 @@ public class BAMF_NodeWorkView : BAMF_ViewBase {
 	#region protected variables
 	private Vector2 mousePos;
 	int deleteNodeIdx = 0;
+
+	//music previews
+	BAMF_MusicNode.BAMF_MusicClip clipToEdit;
 	#endregion
 
 	#region constructor
@@ -68,6 +71,7 @@ public class BAMF_NodeWorkView : BAMF_ViewBase {
 					//context menu
 					mousePos = e.mousePosition;
 					bool overNode = false;
+					bool overMusic = false;
 					deleteNodeIdx = 0;
 					if (currentGraph != null) {
 						if (currentGraph.nodes.Count > 0) {
@@ -79,9 +83,34 @@ public class BAMF_NodeWorkView : BAMF_ViewBase {
 							}
 						}
 					}
+					if (currentGraph != null) {
+						if (currentGraph.nodes != null) {
+							for (int i = 0; i < currentGraph.nodes.Count; i++) {
+								if (currentGraph.nodes [i].nodeRect.Contains (e.mousePosition)) {
+									if (currentGraph.nodes [i].nodeType == NodeType.Music) {
+										if (currentGraph.nodes [i].GetLayers ().Count > 0) {
+											List<BAMF_MusicNode.BAMF_MusicClip> layers = currentGraph.nodes [i].GetLayers ();
+											for (int j = 0; j < layers.Count; j++) {
+												e = Event.current;
+												if (layers [j].prevRect.Contains (e.mousePosition)) {
+													overNode = false;
+													overMusic = true;
+													clipToEdit = layers [j];
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+
+
 					if (overNode) {
 						ProcessContextMenu (e, 1); // 1 = node context menu
-					} else {
+					} else if (overMusic) {
+						ProcessContextMenu (e, 2);
+					}else {
 						ProcessContextMenu (e, 0); // 0 = normal context menu
 					}
 				}
@@ -110,6 +139,10 @@ public class BAMF_NodeWorkView : BAMF_ViewBase {
 			}
 		} else if (contextID == 1) {
 			menu.AddItem (new GUIContent ("Delete Node"), false, ContextCallback, "5");
+		} else if (contextID == 2) {
+			menu.AddItem (new GUIContent ("Edit Cues"), false, ContextCallback, "editCues");
+			menu.AddSeparator ("");
+			menu.AddItem (new GUIContent ("Delete Layer"), false, ContextCallback, "deleteLayer");
 		}
 		menu.ShowAsContext ();
 		e.Use ();
@@ -144,6 +177,13 @@ public class BAMF_NodeWorkView : BAMF_ViewBase {
 		case "Music":
 			//
 			BAMF_NodeUtilities.CreateNode(currentGraph, NodeType.Music, mousePos);
+			break;
+		case "editCues":
+			// 
+			BAMF_MusicEditWindow.InitNodePopup (clipToEdit.layerNumber, clipToEdit);
+			break;
+		case "deleteLayer":
+			// DELETE THE LAYER
 			break;
 		default:
 			//
