@@ -48,9 +48,9 @@ public class BAMF_NodeBase : ScriptableObject {//want it to be attached to an as
 		} else {
 			GUI.Box (nodeRect, nodeName, viewSkin.GetStyle ("NodeDefault"));
 		}
-		contentRect.x = nodeRect.x  +5f; contentRect.y = nodeRect.y + 25f; 
-		contentRect.width = nodeRect.width - 10f; contentRect.height = nodeRect.height - (25f + 5f);
-		GUI.Box (contentRect, "", viewSkin.GetStyle ("NodeContent"));
+//		contentRect.x = nodeRect.x  +5f; contentRect.y = nodeRect.y + 25f; 
+//		contentRect.width = nodeRect.width - 10f; contentRect.height = nodeRect.height - (25f + 5f);
+//		GUI.Box (contentRect, "", viewSkin.GetStyle ("NodeContent"));
 
 		DrawConnections ();
 

@@ -12,7 +12,6 @@ public class BAMF_NodeGraph : ScriptableObject {
 	public List<BAMF_NodeBase> nodes;
 	public BAMF_NodeBase selectedNode;
 
-	public bool selectMode = false;
 	public bool connectionMode = false;
 	public BAMF_NodeBase clickedNode = null;
 	public int clickedNodeOutputID;
