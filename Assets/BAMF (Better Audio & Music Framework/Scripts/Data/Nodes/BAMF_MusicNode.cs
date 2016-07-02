@@ -14,6 +14,7 @@ public class BAMF_MusicNode : BAMF_NodeBase {
 	int musicBase = 4;
 	//preview rect info
 	Rect previewRect;
+	Rect iconRect;
 
 	public override void InitNode (){
 		base.InitNode ();
@@ -35,9 +36,13 @@ public class BAMF_MusicNode : BAMF_NodeBase {
 	public override void UpdateNodeGUI (Event e, Rect viewRect, GUISkin viewSkin){
 		base.UpdateNodeGUI (e, viewRect, viewSkin);
 		Rect allMusic = new Rect (contentRect.x, contentRect.y, contentRect.width, (contentRect.height));
-		Rect info = new Rect (contentRect.x+10, contentRect.y + (nodeRect.height / 4f)*3f, contentRect.width-2, nodeRect.height / 4f);
+		Rect info = new Rect (nodeRect.x+10, nodeRect.y + nodeRect.height - 47, nodeRect.width-2, 75);
+
+		float test = (layers.Count>0 ? 130 : 140) + (70*(layers.Count));
+		nodeRect.height = test;
+
 		contentRect.x = nodeRect.x  +5f; contentRect.y = nodeRect.y + 25f; 
-		contentRect.width = nodeRect.width - 10f; contentRect.height = (nodeRect.height/4)*3.2f - (25f + 5f);
+		contentRect.width = nodeRect.width - 10f; contentRect.height = nodeRect.height - 73;
 		GUI.Box (contentRect, "", viewSkin.GetStyle ("NodeContent"));
 
 
@@ -51,7 +56,9 @@ public class BAMF_MusicNode : BAMF_NodeBase {
 			}
 		}
 		if (layers.Count > 0) {
+			Vector2 scrollpos = new Vector2 (0, 0);
 			GUILayout.BeginArea (allMusic);
+
 			// Draw all layers
 			for (int i = 0; i < layers.Count; i++) { 
 				GUILayout.BeginHorizontal ();
@@ -66,50 +73,57 @@ public class BAMF_MusicNode : BAMF_NodeBase {
 				GUILayout.Space (thisRect.height); //make space for next layer
 			}
 
-			DropArea (new Rect (GUILayoutUtility.GetLastRect ().x+30, GUILayoutUtility.GetLastRect ().y+GUILayoutUtility.GetLastRect ().height+15, contentRect.width - 60f, contentRect.height / 6), viewSkin);
+			DropArea (new Rect (GUILayoutUtility.GetLastRect ().x+30, GUILayoutUtility.GetLastRect ().y+GUILayoutUtility.GetLastRect ().height+15, contentRect.width - 60f, 30), viewSkin);
 
 			GUILayout.EndArea ();
 
-			//General info
-			GUILayout.BeginArea (info);
-			//GUILayout.Label ("Musical Properties", viewSkin.GetStyle ("NodeContentText"));
 
-			GUILayout.BeginHorizontal ();
 
-			GUILayout.BeginVertical ();
-			GUILayout.Label ("BPM", viewSkin.GetStyle ("NodeContentTextNonCenter"));
-			musicBPM = EditorGUILayout.IntField(musicBPM, viewSkin.GetStyle ("NodeContentTextNonCenter"), GUILayout.MaxHeight(20), GUILayout.MaxWidth(30));
-			GUILayout.EndVertical ();
 
-			GUILayout.Space (20);
+			//INFO AREA
+			{//General info
+				GUILayout.BeginArea (info);
+				//GUILayout.Label ("Musical Properties", viewSkin.GetStyle ("NodeContentText"));
 
-			GUILayout.BeginVertical ();
-			GUILayout.Label ("METER", viewSkin.GetStyle ("NodeContentTextNonCenter"));
-			GUILayout.BeginHorizontal ();
-			musicStep = EditorGUILayout.IntField(musicStep, viewSkin.GetStyle ("NodeContentTextNonCenter"), GUILayout.MaxWidth(10), GUILayout.MaxHeight(20));
-			GUILayout.Label ("/", viewSkin.GetStyle ("NodeContentText"));
-			musicBase = EditorGUILayout.IntField(musicBase, viewSkin.GetStyle ("NodeContentTextNonCenter"), GUILayout.MaxWidth(10), GUILayout.MaxHeight(20));
-			GUILayout.Space (60);
-			GUILayout.EndHorizontal ();
+				GUILayout.BeginHorizontal ();
 
-			Rect iconRect = new Rect (info.width-(info.height-25), 8, info.height-45, info.height-45);
-			GUI.DrawTexture (iconRect, Resources.Load("Textures/Editor/icon_combat") as Texture2D);
-			GUILayout.EndVertical ();
-
-			for (int i = 0; i < 5; i++) {
 				GUILayout.BeginVertical ();
-				GUILayout.Space (60);
+				GUILayout.Label ("BPM", viewSkin.GetStyle ("NodeContentTextNonCenter"));
+				musicBPM = EditorGUILayout.IntField (musicBPM, viewSkin.GetStyle ("NodeContentTextNonCenter"), GUILayout.MaxHeight (20), GUILayout.MaxWidth (30));
 				GUILayout.EndVertical ();
-			}
-			GUILayout.EndHorizontal ();
-			GUILayout.EndArea ();
 
+				GUILayout.Space (20);
+
+				GUILayout.BeginVertical ();
+				GUILayout.Label ("METER", viewSkin.GetStyle ("NodeContentTextNonCenter"));
+				GUILayout.BeginHorizontal ();
+				musicStep = EditorGUILayout.IntField (musicStep, viewSkin.GetStyle ("NodeContentTextNonCenter"), GUILayout.MaxWidth (10), GUILayout.MaxHeight (20));
+				GUILayout.Label ("/", viewSkin.GetStyle ("NodeContentText"));
+				musicBase = EditorGUILayout.IntField (musicBase, viewSkin.GetStyle ("NodeContentTextNonCenter"), GUILayout.MaxWidth (10), GUILayout.MaxHeight (20));
+				GUILayout.Space (60);
+				GUILayout.EndHorizontal ();
+
+				iconRect = new Rect (info.width - (info.height - 25), 8, info.height - 45, info.height - 45);
+				GUI.DrawTexture (iconRect, Resources.Load ("Textures/Editor/icon_combat") as Texture2D);
+				GUILayout.EndVertical ();
+
+				for (int i = 0; i < 5; i++) {
+					GUILayout.BeginVertical ();
+					GUILayout.Space (60);
+					GUILayout.EndVertical ();
+				}
+				GUILayout.EndHorizontal ();
+				GUILayout.EndArea ();
+
+			}
+
+			handleIconClick ();
 
 		} else { //user has yet to drop an Audio Clip
 			GUILayout.BeginArea (contentRect);
 			GUILayout.Label ("Drop an Audio Clip below.", viewSkin.GetStyle ("NodeContentText")); 
 			GUILayout.EndArea ();
-			DropArea (new Rect (contentRect.x + 15f, contentRect.y + 25f, contentRect.width - 30f, contentRect.height / 6), viewSkin);
+			DropArea (new Rect (contentRect.x + 15f, contentRect.y + 25f, contentRect.width - 30f, 30), viewSkin);
 		}
 	} 
 
@@ -147,6 +161,15 @@ public class BAMF_MusicNode : BAMF_NodeBase {
 				}
 
 				break;
+			}
+		}
+	}
+
+	void handleIconClick(){
+		Event e = Event.current;
+		if(iconRect.Contains(e.mousePosition)){
+			if(e.type == EventType.mouseDown){
+				Debug.Log("clicked icon");
 			}
 		}
 	}
