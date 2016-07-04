@@ -204,9 +204,7 @@ public class BAMF_MusicNode : BAMF_NodeBase {
 	public override void SetLayer (BAMF_MusicClip newClip, int idx)
 	{
 		layers [idx] = newClip;
-		Debug.Log ("changed Layer " + idx);
 	}
-
 
 	void AddNewLayer (BAMF_MusicClip music)
 	{

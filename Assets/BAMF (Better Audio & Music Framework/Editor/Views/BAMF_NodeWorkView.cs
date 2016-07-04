@@ -109,7 +109,7 @@ public class BAMF_NodeWorkView : BAMF_ViewBase {
 					if (overNode) {
 						ProcessContextMenu (e, 1); // 1 = node context menu
 					} else if (overMusic) {
-						ProcessContextMenu (e, 2);
+						ProcessContextMenu (e, 2); // music layer context menu
 					}else {
 						ProcessContextMenu (e, 0); // 0 = normal context menu
 					}
@@ -140,9 +140,11 @@ public class BAMF_NodeWorkView : BAMF_ViewBase {
 		} else if (contextID == 1) {
 			menu.AddItem (new GUIContent ("Delete Node"), false, ContextCallback, "5");
 		} else if (contextID == 2) {
-			menu.AddItem (new GUIContent ("Edit Cues"), false, ContextCallback, "editCues");
+			menu.AddItem (new GUIContent ("Edit Cues for Layer "+(clipToEdit.layerNumber+1)), false, ContextCallback, "editCues");
 			menu.AddSeparator ("");
-			menu.AddItem (new GUIContent ("Delete Layer"), false, ContextCallback, "deleteLayer");
+			menu.AddItem (new GUIContent ("Delete Layer "+(clipToEdit.layerNumber+1)), false, ContextCallback, "deleteLayer");
+			menu.AddSeparator ("");
+			menu.AddItem (new GUIContent ("Delete Node"), false, ContextCallback, "5");
 		}
 		menu.ShowAsContext ();
 		e.Use ();
@@ -184,6 +186,7 @@ public class BAMF_NodeWorkView : BAMF_ViewBase {
 			break;
 		case "deleteLayer":
 			// DELETE THE LAYER
+			clipToEdit.parentNode.layers.RemoveAt(clipToEdit.layerNumber);
 			break;
 		default:
 			//
