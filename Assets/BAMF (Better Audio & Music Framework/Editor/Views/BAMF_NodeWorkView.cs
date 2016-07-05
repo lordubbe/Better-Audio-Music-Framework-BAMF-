@@ -139,8 +139,21 @@ public class BAMF_NodeWorkView : BAMF_ViewBase {
 			}
 		} else if (contextID == 1) {
 			menu.AddItem (new GUIContent ("Delete Node"), false, ContextCallback, "5");
-		} else if (contextID == 2) {
+		} else if (contextID == 2) { // over music layer
 			menu.AddItem (new GUIContent ("Edit Cues for Layer "+(clipToEdit.layerNumber+1)), false, ContextCallback, "editCues");
+			menu.AddSeparator ("");
+			if (clipToEdit.layerNumber > 0) {
+				menu.AddItem (new GUIContent ("Move Layer Up"), false, ContextCallback, "moveLayerUp");
+				if (clipToEdit.layerNumber == clipToEdit.parentNode.layers.Count - 1) {
+					menu.AddDisabledItem (new GUIContent ("Move Layer Down"));
+				}
+			}
+			if (clipToEdit.layerNumber < clipToEdit.parentNode.layers.Count - 1) {
+				if (clipToEdit.layerNumber == 0) {
+					menu.AddDisabledItem (new GUIContent ("Move Layer Up"));
+				}
+				menu.AddItem (new GUIContent ("Move Layer Down"), false, ContextCallback, "moveLayerDown");
+			}
 			menu.AddSeparator ("");
 			menu.AddItem (new GUIContent ("Delete Layer "+(clipToEdit.layerNumber+1)), false, ContextCallback, "deleteLayer");
 			menu.AddSeparator ("");
@@ -187,6 +200,18 @@ public class BAMF_NodeWorkView : BAMF_ViewBase {
 		case "deleteLayer":
 			// DELETE THE LAYER
 			clipToEdit.parentNode.layers.RemoveAt(clipToEdit.layerNumber);
+			break;
+		case "moveLayerUp":
+			//
+			BAMF_MusicNode.BAMF_MusicClip tmp = clipToEdit.parentNode.layers [clipToEdit.layerNumber];
+			clipToEdit.parentNode.layers [clipToEdit.layerNumber] = clipToEdit.parentNode.layers [clipToEdit.layerNumber - 1];
+			clipToEdit.parentNode.layers [clipToEdit.layerNumber-1] = tmp;
+			break;
+		case "moveLayerDown":
+			//
+			BAMF_MusicNode.BAMF_MusicClip temp = clipToEdit.parentNode.layers [clipToEdit.layerNumber];
+			clipToEdit.parentNode.layers [clipToEdit.layerNumber] = clipToEdit.parentNode.layers [clipToEdit.layerNumber + 1];
+			clipToEdit.parentNode.layers [clipToEdit.layerNumber+1] = temp;
 			break;
 		default:
 			//

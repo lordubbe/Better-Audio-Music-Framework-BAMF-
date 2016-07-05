@@ -83,14 +83,22 @@ public class BAMF_MusicNode : BAMF_NodeBase {
 				GUI.DrawTexture (thisRect, layers [i].preview);
 
 				layers [i].prevRect = thisRect;
+
+				//draw cues
+				Rect pre = new Rect(5 + layers[i].prevRect.width / layers[i].clip.samples * layers[i].preEntry, layers[i].prevRect.y, 1, layers[i].prevRect.height);
+				Rect untilPre = new Rect (5, layers [i].prevRect.y, layers [i].prevRect.width / layers [i].clip.samples * layers [i].preEntry, layers [i].prevRect.height);
+				EditorGUI.DrawRect (pre, new Color(0,1,0,0.5f));
+				EditorGUI.DrawRect (untilPre, new Color (0, 0, 0, 0.5f));
+
+				Rect post = new Rect (5 + layers [i].prevRect.width / layers [i].clip.samples * layers [i].postExit, layers [i].prevRect.y, 1, layers [i].prevRect.height);
+				Rect fromPost = new Rect (post.x+1, post.y, layers[i].prevRect.width - post.x + 4, post.height);
+				EditorGUI.DrawRect (fromPost, new Color (0, 0, 0, 0.5f));
+				EditorGUI.DrawRect (post, new Color(1,0,0,0.5f));
+
 				layers [i].prevRect.x += nodeRect.x;
 				layers [i].prevRect.y += nodeRect.y+30;
 				layers [i].layerNumber = i;
-
-				//handle mouse events
-				e = Event.current;
-
-		
+				
 				GUILayout.Space (thisRect.height); //make space for next layer
 			}
 
