@@ -68,6 +68,11 @@ public static class BAMF_NodeUtilities {
 				//currentNode.nodeName = nodeType.ToString () + " Node";
 				currentNode.nodeName = "M U S I C  P I E C E"; 
 				break;
+			case NodeType.ParameterModifier:
+				//
+				currentNode = ScriptableObject.CreateInstance<BAMF_ParameterModifier> () as BAMF_ParameterModifier;
+				currentNode.nodeName = "P A R A M E T E R";
+				break;
 			default: 
 				//
 				break;
@@ -114,17 +119,17 @@ public static class BAMF_NodeUtilities {
 		}
 	}
 
-	public static void DrawGrid(Rect viewRect, float gridSpacing, float gridOpacity, Color gridColor){
-		int widthDivs = Mathf.CeilToInt (viewRect.width / gridSpacing);
-		int heightDivs = Mathf.CeilToInt (viewRect.height / gridSpacing);
+	public static void DrawGrid(Rect viewRect, float gridSpacing, float gridOpacity, Color gridColor, Vector2 gridOffset, int nodeCount){
+		int widthDivs = Mathf.CeilToInt ((viewRect.width - gridOffset.x) / gridSpacing);
+		int heightDivs = Mathf.CeilToInt ((viewRect.height - gridOffset.y) / gridSpacing);
 
 		Handles.BeginGUI ();
 		Handles.color = new Color (gridColor.r, gridColor.g, gridColor.b, gridOpacity);
 		for (int x = 0; x < widthDivs; x++) {
-			Handles.DrawLine (new Vector3 (gridSpacing * x, 0, 0), new Vector3 (gridSpacing * x, viewRect.height));
+			Handles.DrawLine (new Vector3 (gridOffset.x/nodeCount + gridSpacing * x, 0, 0), new Vector3 (gridOffset.x/nodeCount + gridSpacing * x, viewRect.height));
 		}
 		for (int y = 0; y < heightDivs; y++) {
-			Handles.DrawLine (new Vector3 (0, gridSpacing * y, 0), new Vector3 (viewRect.width, gridSpacing * y));
+			Handles.DrawLine (new Vector3 (0, gridOffset.y/nodeCount + gridSpacing * y, 0), new Vector3 (viewRect.width, gridOffset.y/nodeCount + gridSpacing * y));
 		}
 		Handles.color = Color.white;
 		Handles.EndGUI ();

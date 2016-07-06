@@ -14,6 +14,11 @@ public class BAMF_NodeWorkView : BAMF_ViewBase {
 	#region protected variables
 	private Vector2 mousePos;
 	int deleteNodeIdx = 0;
+	bool draggingworkspace = false;
+	Vector2 gridOffset = new Vector2(0f,0f);
+	bool multiSelect = false;
+	Vector2 multiSelectStartPos;
+	Vector2 multiSelectEndPos;
 
 	//music previews
 	BAMF_MusicNode.BAMF_MusicClip clipToEdit;
@@ -34,8 +39,8 @@ public class BAMF_NodeWorkView : BAMF_ViewBase {
 		}
 		GUI.Box (viewRect, viewTitle, viewSkin.GetStyle("ViewBG"));
 		if (currentGraph != null) {
-			BAMF_NodeUtilities.DrawGrid (viewRect, 25, .1f, Color.white);
-			BAMF_NodeUtilities.DrawGrid (viewRect, 50f, .2f, Color.white);
+			BAMF_NodeUtilities.DrawGrid (viewRect, 25, .1f, Color.white, gridOffset, currentGraph.nodes.Count);
+			BAMF_NodeUtilities.DrawGrid (viewRect, 50f, .2f, Color.white, gridOffset, currentGraph.nodes.Count);
 		} else {
 			//TODO: draw drag & drop screen here
 		}
@@ -44,6 +49,50 @@ public class BAMF_NodeWorkView : BAMF_ViewBase {
 		if (currentGraph != null) {
 			currentGraph.UpdateGraphGUI (e, viewRect, viewSkin );
 		}
+
+		if (multiSelect) {
+			multiSelectEndPos = Event.current.mousePosition;
+			Rect selection = new Rect (multiSelectStartPos.x, multiSelectStartPos.y, multiSelectEndPos.x - multiSelectStartPos.x, multiSelectEndPos.y - multiSelectStartPos.y);
+			EditorGUI.DrawRect (selection, new Color (1, 1, 1, 0.2f));
+			for (int i = 0; i < currentGraph.nodes.Count; i++) {
+				if (!currentGraph.nodes [i].isSelected) {
+					for (float x = multiSelectStartPos.x; x < multiSelectEndPos.x; x += 10) {
+						for (float y = multiSelectStartPos.y; y < multiSelectEndPos.y; y += 10) {
+							if (currentGraph.nodes [i].nodeRect.Contains (new Vector2 (x, y))) {
+								currentGraph.nodes [i].isSelected = true;
+								currentGraph.nodes [i].canMove = false;
+							}
+						}
+					}
+				} else {
+					bool stillSelected = false;
+					for (float x = multiSelectStartPos.x; x < multiSelectEndPos.x; x += 10) {
+						for (float y = multiSelectStartPos.y; y < multiSelectEndPos.y; y += 10) {
+							if (currentGraph.nodes [i].nodeRect.Contains (new Vector2 (x, y))) {
+								stillSelected = true;
+							}
+						}
+					}
+					if (!stillSelected) {
+						currentGraph.nodes [i].isSelected = false;
+						currentGraph.nodes [i].canMove = true;
+					}
+				}
+			}
+		} else {
+			if (currentGraph != null) {
+				currentGraph.amountSelected = 0;
+				for (int i = 0; i < currentGraph.nodes.Count; i++) {
+					if (currentGraph.nodes [i].isSelected) {
+						currentGraph.amountSelected++;
+					}
+				}
+				if (currentGraph.amountSelected == 0) {
+					currentGraph.multiSelected = false;
+				}
+			}
+		}
+
 
 		GUILayout.EndArea ();
 
@@ -54,15 +103,109 @@ public class BAMF_NodeWorkView : BAMF_ViewBase {
 	{
 		base.ProcessEvents (e);
 		if (viewRect.Contains (e.mousePosition)) { //If mouse is inside this view
-			if (e.button == 0) {//left click
+			if (e.button == 2) {//middle click
 				if (e.type == EventType.MouseDown) {
-					
+					mousePos = e.mousePosition;
+					bool overNode = false;
+					if (currentGraph != null) {
+						if (currentGraph.nodes.Count > 0) {
+							for (int i = 0; i < currentGraph.nodes.Count; i++) {
+								if (currentGraph.nodes [i].nodeRect.Contains (mousePos)) {
+									overNode = true;
+								}
+							}
+						}
+					}
+					if (!overNode) {
+						draggingworkspace = true;
+					}
 				}
 				if (e.type == EventType.MouseDrag) {
+					if (draggingworkspace) {
+						for (int i = 0; i < currentGraph.nodes.Count; i++) {
+							
+							gridOffset.x += e.delta.x;
+							gridOffset.y += e.delta.y;
+							if (gridOffset.x > 0) {
+								gridOffset.x = 0;
+							} else {
+								currentGraph.nodes [i].nodeRect.x += e.delta.x;
+							}
+							if (gridOffset.y > 0) {
+								gridOffset.y = 0;
+							} else {
+								currentGraph.nodes [i].nodeRect.y += e.delta.y;
+							}
 
+							//also move inputs of music nodes 
+							if (currentGraph.nodes [i].nodeType == NodeType.Music) {
+								if (currentGraph.nodes [i].inputs.Count > 0) {
+									for (int j = 0; j < currentGraph.nodes [i].inputs.Count; j++) {
+										if ((gridOffset.x > 0)) {
+											currentGraph.nodes [i].inputs [j].inputRect.x += e.delta.x;
+										}
+										if ((gridOffset.y > 0)) {
+											currentGraph.nodes [i].inputs [j].inputRect.y += e.delta.y;
+										}
+									}
+								}
+							}
+						}
+					}
 				}
 				if (e.type == EventType.MouseUp) {
+					draggingworkspace = false;
+				}
+			}
+
+			if (e.button == 0) { //left click (MULTISELECT)
+				if (e.type == EventType.MouseDown) {
+					mousePos = e.mousePosition;
+					bool overNode = false;
+					int overIdx = 0;
+					if (currentGraph != null) {
+						if (currentGraph.nodes.Count > 0) {
+							for (int i = 0; i < currentGraph.nodes.Count; i++) {
+								if (currentGraph.nodes [i].nodeRect.Contains (mousePos)) {
+									overNode = true;
+									overIdx = i;
+								}
+							}
+						}
+					}
+					if (!overNode) {
+						multiSelectStartPos = mousePos;
+						multiSelectEndPos = mousePos;
+						multiSelect = true;
+						currentGraph.amountSelected = 0;
+					} else {
+						if (!currentGraph.nodes [overIdx].isSelected) {
+							if (e.shift) {
+								currentGraph.multiSelected = true;
+							} else {
+								currentGraph.multiSelected = false;
+							}
+						}
+//						if (e.shift) {
+//							currentGraph.multiSelected = true;
+//						}
+					}
+				}
+
+				if (e.type == EventType.MouseDrag) {
 					
+				}
+
+				if (e.type == EventType.MouseUp) {
+					for (int i = 0; i < currentGraph.nodes.Count; i++) {
+						if (currentGraph.nodes [i].isSelected) {
+							if (multiSelect) {
+								currentGraph.multiSelected = true; 
+							}
+						} 
+						currentGraph.nodes [i].canMove = true;
+					}
+					multiSelect = false;
 				}
 			}
 
@@ -120,6 +263,12 @@ public class BAMF_NodeWorkView : BAMF_ViewBase {
 	#endregion
 
 	#region utility methods
+	void DeselectAllNodes(){
+		for (int i = 0; i < currentGraph.nodes.Count; i++) {
+			currentGraph.nodes [i].isSelected = false;
+		}
+	}
+
 	void ProcessContextMenu(Event e, int contextID){
 		GenericMenu menu = new GenericMenu ();
 
@@ -132,6 +281,7 @@ public class BAMF_NodeWorkView : BAMF_ViewBase {
 
 				menu.AddSeparator ("");
 				menu.AddItem (new GUIContent ("Music Piece"), false, ContextCallback, "Music");
+				menu.AddItem (new GUIContent ("Parameter Modifier"), false, ContextCallback, "ParameterModifier");
 
 				menu.AddSeparator ("");
 				menu.AddItem (new GUIContent ("Float node"), false, ContextCallback, "3");
@@ -192,6 +342,10 @@ public class BAMF_NodeWorkView : BAMF_ViewBase {
 		case "Music":
 			//
 			BAMF_NodeUtilities.CreateNode(currentGraph, NodeType.Music, mousePos);
+			break;
+		case "ParameterModifier":
+			//
+			BAMF_NodeUtilities.CreateNode(currentGraph, NodeType.ParameterModifier, mousePos);
 			break;
 		case "editCues":
 			// 

@@ -80,8 +80,9 @@ public class BAMF_MusicNode : BAMF_NodeBase {
 				Rect lastRect = GUILayoutUtility.GetLastRect ();
 				Rect thisRect = new Rect (5f, (lastRect.y+lastRect.height) + previewRect.y * (1 + i), previewRect.width, previewRect.height);
 				EditorGUI.DrawRect (thisRect, Color.black + (Color.white * 0.2f));
-				GUI.DrawTexture (thisRect, layers [i].preview);
-
+				if (layers [i].preview != null) {
+					GUI.DrawTexture (thisRect, layers [i].preview);
+				}
 				layers [i].prevRect = thisRect;
 
 				//draw cues
@@ -177,11 +178,11 @@ public class BAMF_MusicNode : BAMF_NodeBase {
 				}
 
 				break;
-			case EventType.mouseDown:
-				EditorGUIUtility.ShowObjectPicker<AudioClip> (null, false, "", 0);
-				ObjectPickerID = EditorGUIUtility.GetObjectPickerControlID ();
-				ObjectPickerSelection = (AudioClip)EditorGUIUtility.GetObjectPickerObject ();
-				break;
+//			case EventType.mouseDown: OBJECT PICKER IS BUGGY
+//				EditorGUIUtility.ShowObjectPicker<AudioClip> (null, false, "", 0);
+//				ObjectPickerID = EditorGUIUtility.GetObjectPickerControlID ();
+//				ObjectPickerSelection = (AudioClip)EditorGUIUtility.GetObjectPickerObject ();
+//				break;
 			}
 		}
 		if (Event.current.commandName == "ObjectSelectorUpdated") {

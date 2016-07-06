@@ -38,7 +38,7 @@ public class BAMF_MusicEditWindow : EditorWindow {
 		currentWindow = EditorWindow.GetWindow<BAMF_MusicEditWindow> () as BAMF_MusicEditWindow;
 		currentWindow.titleContent = new GUIContent ("BAMF Cue editor");
 		currentWindow.minSize = new Vector2 (500, 323);
-		currentWindow.maxSize = new Vector2 (1000, 323);
+		currentWindow.maxSize = new Vector2 (1500, 323);
 		node = n; layerNumber = layerNo;
 		origNode = n;
 
@@ -129,6 +129,8 @@ public class BAMF_MusicEditWindow : EditorWindow {
 		}
 		GUILayout.EndHorizontal ();
 		GUILayout.EndArea ();
+
+		// 
 
 		Repaint ();
 	}

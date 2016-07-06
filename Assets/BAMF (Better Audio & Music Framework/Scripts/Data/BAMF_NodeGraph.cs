@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+﻿	using UnityEngine;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -11,12 +11,15 @@ public class BAMF_NodeGraph : ScriptableObject {
 	public string graphName = "New Graph";
 	public List<BAMF_NodeBase> nodes;
 	public BAMF_NodeBase selectedNode;
+	public int amountSelected;
+	public bool multiSelected;
 
 	public bool connectionMode = false;
 	public BAMF_NodeBase clickedNode = null;
 	public int clickedNodeOutputID;
 
 	public Texture2D bezierTex;
+
 	#endregion
 
 	#region main methods
@@ -67,17 +70,43 @@ public class BAMF_NodeGraph : ScriptableObject {
 
 	#region utility methods
 	void ProcessEvents(Event e, Rect viewRect){
+		Debug.Log ("m: " + multiSelected);
 		if(viewRect.Contains(e.mousePosition)){//if the event happens inside this graph
 			if (e.button == 0) {//left click
 				if (e.type == EventType.MouseDown) {
-					DeselectAllNodes ();
 					bool setNode = false;
 					selectedNode = null;
 					for (int i = 0; i < nodes.Count; i++) {
 						if (nodes [i].nodeRect.Contains (e.mousePosition)) { //if clicking a node
-							nodes [i].isSelected = true;
-							selectedNode = nodes [i];//now we know which node is clicked
-							setNode = true; // then we should select the node
+							if (amountSelected == 1) {
+								if (!e.shift) {
+									DeselectAllNodes ();
+									nodes [i].isSelected = true;
+									selectedNode = nodes [i];//now we know which node is clicked
+									setNode = true; // then we should select the node
+								}
+							} else	if (!e.shift && !multiSelected) {
+									DeselectAllNodes ();
+									nodes [i].isSelected = true;
+									selectedNode = nodes [i];//now we know which node is clicked
+									setNode = true; // then we should select the node
+							}
+							if (!nodes [i].isSelected && !e.shift) {
+								DeselectAllNodes ();
+								nodes [i].isSelected = true;
+								selectedNode = nodes [i];//now we know which node is clicked
+								setNode = true; // then we should select the node
+							} else if (!nodes [i].isSelected && e.shift) {
+								multiSelected = true; 		
+								nodes [i].isSelected = true;
+								selectedNode = nodes [i];//now we know which node is clicked
+								setNode = true; // then we should select the node
+							} else if (nodes [i].isSelected && amountSelected > 1) {
+								multiSelected = true; 		
+								nodes [i].isSelected = true;
+								selectedNode = nodes [i];//now we know which node is clicked
+								setNode = true; // then we should select the node
+							}
 						}
 					}
 
@@ -167,6 +196,7 @@ public class BAMF_NodeGraph : ScriptableObject {
 		for (int i = 0; i < nodes.Count; i++) {
 			nodes [i].isSelected = false;
 		}
+		amountSelected = 0;
 	}
 
 	void DrawConnectionToMouse(Vector2 mousePosition){

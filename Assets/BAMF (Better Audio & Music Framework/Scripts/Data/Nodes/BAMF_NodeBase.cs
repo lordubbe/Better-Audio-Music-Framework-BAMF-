@@ -9,6 +9,7 @@ using System.Collections.Generic;
 public class BAMF_NodeBase : ScriptableObject {//want it to be attached to an asset
 	#region public variables
 	public bool isSelected = false;
+	public bool canMove = true;
 	public string nodeName;
 	public Rect nodeRect;
 	public Rect contentRect;
@@ -62,9 +63,9 @@ public class BAMF_NodeBase : ScriptableObject {//want it to be attached to an as
 
 	#region utility methods
 	void ProcessEvents(Event e, Rect viewRect){
-		if (isSelected) {
+		if (isSelected && canMove) {
 			if (viewRect.Contains (e.mousePosition)) {
-				if (e.type == EventType.mouseDrag) {
+				if (e.type == EventType.mouseDrag && e.button == 0) {
 					nodeRect.x += e.delta.x;
 					nodeRect.y += e.delta.y;
 
@@ -91,8 +92,13 @@ public class BAMF_NodeBase : ScriptableObject {//want it to be attached to an as
 				if (inputs [i].isOccupied && inputs [i].connectedNode.outputs [inputs [i].connectedNodeOutputID] != null) {
 					Vector3 startPos = new Vector3 (inputs [i].connectedNode.outputs [inputs [i].connectedNodeOutputID].outputRect.x + inputs [i].connectedNode.outputs [inputs [i].connectedNodeOutputID].outputRect.width, inputs [i].connectedNode.outputs [inputs [i].connectedNodeOutputID].outputRect.y + inputs [i].connectedNode.outputs [inputs [i].connectedNodeOutputID].outputRect.height / 2, 0);
 					Vector3 endPos = new Vector3 (inputs [i].inputRect.x, inputs [i].inputRect.y + 9f, 0);
+					float stiffness = 50;
+					float dist = Mathf.Abs(endPos.x-startPos.x);
+					//if (dist < 30) {
+					stiffness = Mathf.Clamp(dist, 0, 10);
+					//}
 					Handles.DrawBezier (startPos, endPos, 
-						startPos + Vector3.right * 50, endPos + Vector3.left * 50, inputs [i].typeColor, bezierTex != null ? bezierTex : null, 3f);
+						startPos + Vector3.right * stiffness, endPos + Vector3.left * stiffness, inputs [i].typeColor, bezierTex != null ? bezierTex : null, 3f);
 				} else {
 					inputs [i].isOccupied = false;
 				}
