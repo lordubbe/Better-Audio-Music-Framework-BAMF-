@@ -43,17 +43,13 @@ public class BAMF_NodeBase : ScriptableObject {//want it to be attached to an as
 
 	#if UNITY_EDITOR
 	public virtual void UpdateNodeGUI(Event e, Rect viewRect, GUISkin viewSkin){
+		DrawConnections ();
 		ProcessEvents (e, viewRect);
 		if (isSelected) {
 			GUI.Box (nodeRect, nodeName, viewSkin.GetStyle ("NodeActive"));
 		} else {
 			GUI.Box (nodeRect, nodeName, viewSkin.GetStyle ("NodeDefault"));
 		}
-//		contentRect.x = nodeRect.x  +5f; contentRect.y = nodeRect.y + 25f; 
-//		contentRect.width = nodeRect.width - 10f; contentRect.height = nodeRect.height - (25f + 5f);
-//		GUI.Box (contentRect, "", viewSkin.GetStyle ("NodeContent"));
-
-		DrawConnections ();
 
 		EditorUtility.SetDirty (this);
 	}
@@ -74,12 +70,12 @@ public class BAMF_NodeBase : ScriptableObject {//want it to be attached to an as
 							inputs [i].inputRect.x += e.delta.x;
 							inputs [i].inputRect.y += e.delta.y;
 						}
-
-						for (int i = 0; i < outputs.Count; i++) {
-							outputs [i].outputRect.x += e.delta.x;
-							outputs [i].outputRect.y += e.delta.y;
-						}
 					}
+					for (int i = 0; i < outputs.Count; i++) {
+						outputs [i].outputRect.x += e.delta.x;
+						outputs [i].outputRect.y += e.delta.y;
+					}
+						
 				}
 			}
 		}
@@ -95,7 +91,7 @@ public class BAMF_NodeBase : ScriptableObject {//want it to be attached to an as
 					float stiffness = 50;
 					float dist = Mathf.Abs(endPos.x-startPos.x);
 					//if (dist < 30) {
-					stiffness = Mathf.Clamp(dist, 0, 10);
+					stiffness = Mathf.Clamp(dist, 20, 50);
 					//}
 					Handles.DrawBezier (startPos, endPos, 
 						startPos + Vector3.right * stiffness, endPos + Vector3.left * stiffness, inputs [i].typeColor, bezierTex != null ? bezierTex : null, 3f);

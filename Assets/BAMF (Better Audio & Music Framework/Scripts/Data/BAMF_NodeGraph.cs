@@ -70,7 +70,6 @@ public class BAMF_NodeGraph : ScriptableObject {
 
 	#region utility methods
 	void ProcessEvents(Event e, Rect viewRect){
-		Debug.Log ("m: " + multiSelected);
 		if(viewRect.Contains(e.mousePosition)){//if the event happens inside this graph
 			if (e.button == 0) {//left click
 				if (e.type == EventType.MouseDown) {

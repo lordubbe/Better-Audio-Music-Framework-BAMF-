@@ -122,7 +122,9 @@ public static class BAMF_NodeUtilities {
 	public static void DrawGrid(Rect viewRect, float gridSpacing, float gridOpacity, Color gridColor, Vector2 gridOffset, int nodeCount){
 		int widthDivs = Mathf.CeilToInt ((viewRect.width - gridOffset.x) / gridSpacing);
 		int heightDivs = Mathf.CeilToInt ((viewRect.height - gridOffset.y) / gridSpacing);
-
+		if (nodeCount == 0) {
+			nodeCount = 1;
+		}
 		Handles.BeginGUI ();
 		Handles.color = new Color (gridColor.r, gridColor.g, gridColor.b, gridOpacity);
 		for (int x = 0; x < widthDivs; x++) {

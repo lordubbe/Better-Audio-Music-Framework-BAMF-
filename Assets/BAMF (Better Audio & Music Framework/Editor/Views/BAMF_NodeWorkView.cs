@@ -140,11 +140,12 @@ public class BAMF_NodeWorkView : BAMF_ViewBase {
 							//also move inputs of music nodes 
 							if (currentGraph.nodes [i].nodeType == NodeType.Music) {
 								if (currentGraph.nodes [i].inputs.Count > 0) {
+									Debug.Log (currentGraph.nodes [i].inputs.Count);
 									for (int j = 0; j < currentGraph.nodes [i].inputs.Count; j++) {
-										if ((gridOffset.x > 0)) {
+										if ((gridOffset.x < 0)) {
 											currentGraph.nodes [i].inputs [j].inputRect.x += e.delta.x;
 										}
-										if ((gridOffset.y > 0)) {
+										if ((gridOffset.y < 0)) {
 											currentGraph.nodes [i].inputs [j].inputRect.y += e.delta.y;
 										}
 									}
@@ -186,9 +187,6 @@ public class BAMF_NodeWorkView : BAMF_ViewBase {
 								currentGraph.multiSelected = false;
 							}
 						}
-//						if (e.shift) {
-//							currentGraph.multiSelected = true;
-//						}
 					}
 				}
 
