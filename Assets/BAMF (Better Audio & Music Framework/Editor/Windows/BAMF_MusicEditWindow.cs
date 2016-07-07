@@ -47,91 +47,92 @@ public class BAMF_MusicEditWindow : EditorWindow {
 	}
 
 	void OnGUI(){
-		//first update variables to affect changes to BPM and METER
-		beatsPerSec = (node.BPM / 60f);
-		beatsInClip = clipLength/beatsPerSec * node.Base;
+		if(node != null){
+			//first update variables to affect changes to BPM and METER
+			beatsPerSec = (node.BPM / 60f);
+			beatsInClip = clipLength/beatsPerSec * node.Base;
 
-		GUILayout.Space (20);
-		GUILayout.BeginHorizontal ();
-		//GUILayout.Space (20);
-		EditorGUILayout.LabelField ("Edit cues of Layer "+(layerNumber+1)+". '"+node.clipName+"'.", EditorStyles.boldLabel);
-		GUILayout.EndHorizontal ();
+			GUILayout.Space (20);
+			GUILayout.BeginHorizontal ();
+			//GUILayout.Space (20);
+			EditorGUILayout.LabelField ("Edit cues of Layer "+(layerNumber+1)+". '"+node.clipName+"'.", EditorStyles.boldLabel);
+			GUILayout.EndHorizontal ();
 
-		//Draw preview
-		
-		GUILayout.BeginArea (new Rect (0, 30, currentWindow.position.width, 200));
-		GUILayout.BeginHorizontal ();
+			//Draw preview
+			
+			GUILayout.BeginArea (new Rect (0, 30, currentWindow.position.width, 200));
+			GUILayout.BeginHorizontal ();
 
-		previewRect = new Rect(0, margin, currentWindow.position.width, 100f);
-		
-		EditorGUI.DrawRect (previewRect, Color.black + (Color.white * 0.2f));
-		GUI.DrawTexture(previewRect, node.preview);
-		DrawGrid (beatsInClip);
-		DrawPreEntry ();
-		DrawPostExit ();
+			previewRect = new Rect(0, margin, currentWindow.position.width, 100f);
+			
+			EditorGUI.DrawRect (previewRect, Color.black + (Color.white * 0.2f));
+			GUI.DrawTexture(previewRect, node.preview);
+			DrawGrid (beatsInClip);
+			DrawPreEntry ();
+			DrawPostExit ();
 
-		GUILayout.EndHorizontal ();
-		GUILayout.EndArea ();
+			GUILayout.EndHorizontal ();
+			GUILayout.EndArea ();
 
-		GUILayout.Space (100);
+			GUILayout.Space (100);
 
-		EditCues ();
+			EditCues ();
 
-		//Music settings
-		GUILayout.BeginHorizontal();
-		GUILayout.BeginVertical ();
-		GUILayout.BeginHorizontal();
-		EditorGUILayout.LabelField("BPM", GUILayout.MaxWidth(40));
-		node.BPM = EditorGUILayout.IntField (node.BPM, GUILayout.MaxWidth(78));
-		//limit bpm to not crash unity
-		node.BPM = Mathf.Clamp(node.BPM, 20, 999);
-		GUILayout.EndHorizontal ();
+			//Music settings
+			GUILayout.BeginHorizontal();
+			GUILayout.BeginVertical ();
+			GUILayout.BeginHorizontal();
+			EditorGUILayout.LabelField("BPM", GUILayout.MaxWidth(40));
+			node.BPM = EditorGUILayout.IntField (node.BPM, GUILayout.MaxWidth(78));
+			//limit bpm to not crash unity
+			node.BPM = Mathf.Clamp(node.BPM, 20, 999);
+			GUILayout.EndHorizontal ();
 
 
-		GUILayout.BeginHorizontal();
-		EditorGUILayout.LabelField("METER", GUILayout.MaxWidth(40));
-		node.Step = EditorGUILayout.IntField (node.Step, GUILayout.MaxWidth(30));
-		EditorGUILayout.LabelField ("/", GUILayout.MaxWidth (10));
-		node.Base = EditorGUILayout.IntField (node.Base, GUILayout.MaxWidth(30));
-		GUILayout.EndHorizontal ();
-		GUILayout.EndVertical ();
+			GUILayout.BeginHorizontal();
+			EditorGUILayout.LabelField("METER", GUILayout.MaxWidth(40));
+			node.Step = EditorGUILayout.IntField (node.Step, GUILayout.MaxWidth(30));
+			EditorGUILayout.LabelField ("/", GUILayout.MaxWidth (10));
+			node.Base = EditorGUILayout.IntField (node.Base, GUILayout.MaxWidth(30));
+			GUILayout.EndHorizontal ();
+			GUILayout.EndVertical ();
 
-		// Snapping
-		GUILayout.Space(90);
-		GUILayout.BeginVertical ();
-		snapToBeats = EditorGUILayout.ToggleLeft("Snap to beats", snapToBeats);
-		snapToBars = EditorGUILayout.ToggleLeft("Snap to bars", snapToBars);
-		GUILayout.EndVertical ();
+			// Snapping
+			GUILayout.Space(90);
+			GUILayout.BeginVertical ();
+			snapToBeats = EditorGUILayout.ToggleLeft("Snap to beats", snapToBeats);
+			snapToBars = EditorGUILayout.ToggleLeft("Snap to bars", snapToBars);
+			GUILayout.EndVertical ();
 
-		// pre/post exit toggles
-		GUILayout.Space(-40);
-		GUILayout.BeginVertical ();
-		playPreEntry = EditorGUILayout.ToggleLeft("Play pre-entry", playPreEntry);
-		playPostExit = EditorGUILayout.ToggleLeft("Play post-exit", playPostExit);
-		GUILayout.EndVertical ();
+			// pre/post exit toggles
+			GUILayout.Space(-40);
+			GUILayout.BeginVertical ();
+			playPreEntry = EditorGUILayout.ToggleLeft("Play pre-entry", playPreEntry);
+			playPostExit = EditorGUILayout.ToggleLeft("Play post-exit", playPostExit);
+			GUILayout.EndVertical ();
 
-		GUILayout.EndHorizontal ();
+			GUILayout.EndHorizontal ();
 
-		TransportControls ();
+			TransportControls ();
 
-		//Accept / Cancel buttons
-		GUILayout.BeginArea(new Rect(margin, currentWindow.position.height-(40+margin), currentWindow.position.width-(margin*2), 40));
-		GUILayout.BeginHorizontal ();
-		if (GUILayout.Button ("Save", GUILayout.Height (40))) { 
-			//save it
-			node.parentNode.SetLayer(node, layerNumber); 
-			currentWindow.Close ();
-		}
+			//Accept / Cancel buttons
+			GUILayout.BeginArea(new Rect(margin, currentWindow.position.height-(40+margin), currentWindow.position.width-(margin*2), 40));
+			GUILayout.BeginHorizontal ();
+			if (GUILayout.Button ("Save", GUILayout.Height (40))) { 
+				//save it
+				node.parentNode.SetLayer(node, layerNumber); 
+				currentWindow.Close ();
+			}
 
-		if (GUILayout.Button ("Cancel", GUILayout.Height (40))) {
-			node.parentNode.SetLayer(origNode, layerNumber); 
-			currentWindow.Close ();
-		}
-		GUILayout.EndHorizontal ();
-		GUILayout.EndArea ();
+			if (GUILayout.Button ("Cancel", GUILayout.Height (40))) {
+				node.parentNode.SetLayer(origNode, layerNumber); 
+				currentWindow.Close ();
+			}
+			GUILayout.EndHorizontal ();
+			GUILayout.EndArea ();
 
-		// 
-
+			// 
+			}
 		Repaint ();
 	}
 

@@ -20,9 +20,13 @@ public class BAMF_ViewBase {
 	#region Constructors
 	public BAMF_ViewBase(string title){
 		viewTitle = title;
-		GetEditorSkin ();
+
 	}
 	#endregion
+
+	public void OnEnable(){
+		GetEditorSkin ();
+	}
 
 	#region main methods
 	public virtual void UpdateView(Rect editorRect, Rect percentageRect, Event e, BAMF_NodeGraph currentGraph){

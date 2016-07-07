@@ -77,11 +77,19 @@ public class BAMF_MusicNode : BAMF_NodeBase {
 				GUILayout.Label (((i+1).ToString()+". '"+layers[i].clipName+"'"), viewSkin.GetStyle ("NodeContentText"));
 				GUILayout.EndHorizontal ();
 
-				Rect lastRect = GUILayoutUtility.GetLastRect ();
-				Rect thisRect = new Rect (5f, (lastRect.y+lastRect.height) + previewRect.y * (1 + i), previewRect.width, previewRect.height);
+				Rect lastRect = GUILayoutUtility.GetLastRect (); //REAL
+				Rect thisRect = new Rect (5f, (lastRect.y+lastRect.height) + previewRect.y * (1 + i), contentRect.width-10, 50);
 				EditorGUI.DrawRect (thisRect, Color.black + (Color.white * 0.2f));
 				if (layers [i].preview != null) {
 					GUI.DrawTexture (thisRect, layers [i].preview);
+				} else {
+					while (layers [i].preview == null) {//continuously try to get the preview
+						layers [i].preview = AssetPreview.GetAssetPreview (layers [i].clip); 
+						System.Threading.Thread.Sleep (15);
+					}
+					if (layers [i].preview != null) {
+						layers [i].preview.filterMode = FilterMode.Point;
+					}
 				}
 				layers [i].prevRect = thisRect;
 
@@ -223,7 +231,7 @@ public class BAMF_MusicNode : BAMF_NodeBase {
 
 		//Fetch the preview for this audioclip
 		while (music.preview == null) {//continuously try to get the preview
-			music.preview = AssetPreview.GetAssetPreview (music.clip);
+			music.preview = AssetPreview.GetAssetPreview (music.clip); 
 			System.Threading.Thread.Sleep (15);
 		}
 		if (music.preview != null) {
@@ -235,6 +243,7 @@ public class BAMF_MusicNode : BAMF_NodeBase {
 		input.inputRect.x += nodeRect.x; input.inputRect.y += nodeRect.y+(70*(layers.Count));
 		inputs.Add (input);
 	}
+
 	#endif
 
 	#region subclasses

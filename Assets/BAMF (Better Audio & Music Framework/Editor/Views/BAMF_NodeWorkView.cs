@@ -351,7 +351,11 @@ public class BAMF_NodeWorkView : BAMF_ViewBase {
 			break;
 		case "deleteLayer":
 			// DELETE THE LAYER
-			clipToEdit.parentNode.layers.RemoveAt(clipToEdit.layerNumber);
+			clipToEdit.parentNode.layers.RemoveAt (clipToEdit.layerNumber);
+			for (int i = clipToEdit.layerNumber+1; i < clipToEdit.parentNode.inputs.Count; i++) {
+				clipToEdit.parentNode.inputs [i].inputRect.y -= 70;
+			}
+			clipToEdit.parentNode.inputs.RemoveAt (clipToEdit.layerNumber);
 			break;
 		case "moveLayerUp":
 			//

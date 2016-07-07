@@ -1,13 +1,14 @@
 ﻿<Properties RefactoringSettings.EnableRefactorings="True" StartupItem="Assembly-CSharp.csproj">
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="Unity.Instance.Unity Editor" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/BAMF (Better Audio &amp; Music Framework/Editor/Utilities/BAMF_NodeUtilities.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/BAMF (Better Audio &amp; Music Framework/Editor/Views/BAMF_NodeWorkView.cs">
     <Files>
-      <File FileName="Assets/BAMF (Better Audio &amp; Music Framework/Scripts/Data/BAMF_NodeGraph.cs" Line="1" Column="1" />
-      <File FileName="Assets/BAMF (Better Audio &amp; Music Framework/Editor/Views/BAMF_NodeWorkView.cs" Line="122" Column="6" />
-      <File FileName="Assets/BAMF (Better Audio &amp; Music Framework/Editor/Utilities/BAMF_NodeUtilities.cs" Line="118" Column="5" />
+      <File FileName="Assets/BAMF (Better Audio &amp; Music Framework/Scripts/Data/BAMF_NodeGraph.cs" Line="88" Column="30" />
+      <File FileName="Assets/BAMF (Better Audio &amp; Music Framework/Editor/Views/BAMF_NodeWorkView.cs" Line="337" Column="6" />
+      <File FileName="Assets/BAMF (Better Audio &amp; Music Framework/Editor/Utilities/BAMF_NodeUtilities.cs" Line="1" Column="1" />
       <File FileName="Assets/BAMF (Better Audio &amp; Music Framework/Editor/Windows/BAMF_NodePopupWindow.cs" Line="1" Column="1" />
-      <File FileName="Assets/BAMF (Better Audio &amp; Music Framework/Scripts/Data/Nodes/BAMF_NodeBase.cs" Line="69" Column="1" />
-      <File FileName="Assets/BAMF (Better Audio &amp; Music Framework/Scripts/Data/Nodes/BAMF_MusicNode.cs" Line="1" Column="1" />
+      <File FileName="Assets/BAMF (Better Audio &amp; Music Framework/Scripts/Data/Nodes/BAMF_NodeBase.cs" Line="32" Column="1" />
+      <File FileName="Assets/BAMF (Better Audio &amp; Music Framework/Scripts/Data/Nodes/BAMF_MusicNode.cs" Line="243" Column="86" />
+      <File FileName="Assets/BAMF (Better Audio &amp; Music Framework/Editor/Windows/BAMF_MusicEditWindow.cs" Line="374" Column="2" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>

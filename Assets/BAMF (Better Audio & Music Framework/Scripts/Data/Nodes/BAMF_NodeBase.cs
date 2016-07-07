@@ -29,6 +29,10 @@ public class BAMF_NodeBase : ScriptableObject {//want it to be attached to an as
 	public BAMF_NodeBase(){
 		inputs = new List<BAMF_NodeInput>();
 		outputs = new List<BAMF_NodeOutput>();
+
+	}
+
+	public void OnEnable(){
 		bezierTex = Resources.Load ("Textures/Editor/bezierCurve") as Texture2D; //TODO: move to nodebase 
 	}
 
@@ -88,10 +92,10 @@ public class BAMF_NodeBase : ScriptableObject {//want it to be attached to an as
 				if (inputs [i].isOccupied && inputs [i].connectedNode.outputs [inputs [i].connectedNodeOutputID] != null) {
 					Vector3 startPos = new Vector3 (inputs [i].connectedNode.outputs [inputs [i].connectedNodeOutputID].outputRect.x + inputs [i].connectedNode.outputs [inputs [i].connectedNodeOutputID].outputRect.width, inputs [i].connectedNode.outputs [inputs [i].connectedNodeOutputID].outputRect.y + inputs [i].connectedNode.outputs [inputs [i].connectedNodeOutputID].outputRect.height / 2, 0);
 					Vector3 endPos = new Vector3 (inputs [i].inputRect.x, inputs [i].inputRect.y + 9f, 0);
-					float stiffness = 50;
+					float stiffness = 40;
 					float dist = Mathf.Abs(endPos.x-startPos.x);
 					//if (dist < 30) {
-					stiffness = Mathf.Clamp(dist, 20, 50);
+					//stiffness = Mathf.Clamp(dist, 30, 50);
 					//}
 					Handles.DrawBezier (startPos, endPos, 
 						startPos + Vector3.right * stiffness, endPos + Vector3.left * stiffness, inputs [i].typeColor, bezierTex != null ? bezierTex : null, 3f);
