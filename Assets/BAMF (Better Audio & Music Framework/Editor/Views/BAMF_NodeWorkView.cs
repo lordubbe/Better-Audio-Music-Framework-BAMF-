@@ -97,6 +97,9 @@ public class BAMF_NodeWorkView : BAMF_ViewBase {
 		GUILayout.EndArea ();
 
 		ProcessEvents (e);
+		if (draggingworkspace) {
+			EditorGUIUtility.AddCursorRect (new Rect(e.mousePosition.x-50, e.mousePosition.y-50,100,100), MouseCursor.Pan);
+		}
 	}
 
 	public override void ProcessEvents (Event e)
@@ -140,7 +143,6 @@ public class BAMF_NodeWorkView : BAMF_ViewBase {
 							//also move inputs of music nodes 
 							if (currentGraph.nodes [i].nodeType == NodeType.Music) {
 								if (currentGraph.nodes [i].inputs.Count > 0) {
-									Debug.Log (currentGraph.nodes [i].inputs.Count);
 									for (int j = 0; j < currentGraph.nodes [i].inputs.Count; j++) {
 										if ((gridOffset.x < 0)) {
 											currentGraph.nodes [i].inputs [j].inputRect.x += e.delta.x;

@@ -206,7 +206,8 @@ public class BAMF_MusicNode : BAMF_NodeBase {
 
 	void handleIconClick(){
 		Event e = Event.current;
-		if(GUILayoutUtility.GetLastRect().Contains(e.mousePosition)){
+		if(iconRect.Contains(e.mousePosition)){
+			EditorGUIUtility.AddCursorRect (new Rect(e.mousePosition.x-50, e.mousePosition.y-50,100,100), MouseCursor.Link);
 			if(e.type == EventType.mouseDown){
 				Debug.Log("clicked icon");
 			}

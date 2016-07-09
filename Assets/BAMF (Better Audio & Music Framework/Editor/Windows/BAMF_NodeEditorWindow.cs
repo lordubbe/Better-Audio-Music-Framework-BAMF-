@@ -12,6 +12,10 @@ public class BAMF_NodeEditorWindow : EditorWindow {
 	public BAMF_NodeGraph currentGraph = null;
 
 	public float viewPercentage = 0.75f;
+
+	//drag window size functionality
+	Rect viewPercentageGrabber;
+	bool isDragging = false;
 	#endregion
 
 	#region Main Methods
@@ -43,12 +47,12 @@ public class BAMF_NodeEditorWindow : EditorWindow {
 
 		//Get current event and process it!
 		Event e = Event.current;
-		ProcessEvents (e);
 
 		//Update views
+		viewPercentageGrabber = new Rect(position.width*viewPercentage, 0f, 5, position.height);
 		workView.UpdateView (position, new Rect(0f, 0f, viewPercentage, 1f), e, currentGraph);
 		propertyView.UpdateView (new Rect(position.width, position.y, position.width, position.height), new Rect(viewPercentage, 0f, 1f-viewPercentage, 1f), e, currentGraph);
-
+		ProcessEvents (e);
 		Repaint ();
 	}
 	#endregion
@@ -65,13 +69,23 @@ public class BAMF_NodeEditorWindow : EditorWindow {
 
 	void ProcessEvents (Event e)
 	{
-		//Update view percentage with arrowkeys // TODO: CHANGE TO MOUSE DRAG!!!
-		if (e.type == EventType.KeyDown && e.keyCode == KeyCode.LeftArrow) {
-			viewPercentage -= 0.01f;
-			e.Use ();
-		}else if (e.type == EventType.KeyDown && e.keyCode == KeyCode.RightArrow) {
-			viewPercentage += 0.01f;
-			e.Use ();
+		if(viewPercentageGrabber.Contains(e.mousePosition)){
+			EditorGUI.DrawRect(viewPercentageGrabber, new Color(1,1,1,0.1f));
+			if (e.type == EventType.MouseDown) {
+				isDragging = true;
+			}
+			EditorGUIUtility.AddCursorRect (new Rect(e.mousePosition.x-50, e.mousePosition.y-50,100,100), MouseCursor.ResizeHorizontal);
+		}
+		if (isDragging && e.type == EventType.MouseUp) {
+			isDragging = false;
+		}
+
+		if (isDragging) {
+			EditorGUIUtility.AddCursorRect (new Rect(e.mousePosition.x-50, e.mousePosition.y-50,100,100), MouseCursor.ResizeHorizontal);
+			viewPercentage = e.mousePosition.x/position.width;
+			if (viewPercentage > 0.95f) {
+				viewPercentage = 0.95f;
+			}
 		}
 	}
 	#endregion
