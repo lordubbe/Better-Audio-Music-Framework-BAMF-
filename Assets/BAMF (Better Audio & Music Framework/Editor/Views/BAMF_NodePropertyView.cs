@@ -39,8 +39,12 @@ public class BAMF_NodePropertyView : BAMF_ViewBase {
 		base.UpdateView (editorRect, percentageRect, e, currentGraph);
 		GUI.Box (viewRect, viewTitle, viewSkin.GetStyle("ViewBG"));
 
+		StatesRect.width = viewRect.width - (2 * margin); 
+		StatesRect.x = viewRect.x + margin;
 		GUI.Box (StatesRect, "STATES", viewSkin.GetStyle ("NodeContent"));
 
+		ParametersRect.width = viewRect.width - (2 * margin);
+		ParametersRect.x = viewRect.x + margin;
 		GUI.Box (ParametersRect, "PARAMETERS", viewSkin.GetStyle ("NodeContent"));
 
 		//grabbing
@@ -53,7 +57,9 @@ public class BAMF_NodePropertyView : BAMF_ViewBase {
 
 		GUILayout.BeginArea (ParametersRect); //PARAMETERS
 		GUILayout.Space(30);
-		Parameters = new List<float> (){ 0.1f, 0.4f, 0.95f, 0.63f };
+		if (Parameters == null) {
+			Parameters = new List<float> (){ 0.1f, 0.4f, 0.95f, 0.63f };
+		}
 		if (Parameters != null) {
 			GUILayout.BeginHorizontal ();
 			for (int i = 0; i < Parameters.Count; i++) {
