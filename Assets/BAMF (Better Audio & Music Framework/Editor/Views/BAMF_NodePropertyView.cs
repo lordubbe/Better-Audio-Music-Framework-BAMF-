@@ -19,10 +19,11 @@ public class BAMF_NodePropertyView : BAMF_ViewBase {
 	int margin = 5;
 	#endregion
 
-	//?
+	//program variables
 	bool isGrabbing = false;
 	int selectedState;
-	float testParam;
+	int paramsPerLine = 3;
+
 	#region constructor
 	public BAMF_NodePropertyView () : base ("Game States & Parameters"){}
 	#endregion
@@ -30,7 +31,6 @@ public class BAMF_NodePropertyView : BAMF_ViewBase {
 	void OnEnable(){
 		StatesRect = new Rect(viewRect.x+margin, 40, viewRect.width-(2*margin), (viewRect.height/2)-(4*margin));
 		ParametersRect = new Rect (viewRect.x + margin, StatesRect.y + StatesRect.height + margin, viewRect.width - (2 * margin), (viewRect.height / 2) - (8 * margin));
-
 	}
 
 	#region main methods
@@ -60,27 +60,61 @@ public class BAMF_NodePropertyView : BAMF_ViewBase {
 		if (Parameters == null) {
 			Parameters = new List<float> (){ 0.1f, 0.4f, 0.95f, 0.63f };
 		}
+		//set paramsPerLine dynamically according to width
+		if (ParametersRect.width >= 175) {
+			paramsPerLine = 4;
+		}else if (ParametersRect.width >= 125) {
+			paramsPerLine = 3;
+		}else if(ParametersRect.width >= 75){
+			paramsPerLine = 2;
+		}//Debug.Log (ParametersRect.width);
+
 		if (Parameters != null) {
 			GUILayout.BeginHorizontal ();
+			//NICE BUT STUPID TEXT CLIPPING !
+//			int lineNumber = 0;
+//			for (int i = 0; i < Parameters.Count; i++) {
+//				if (i % paramsPerLine == 0) {
+//					lineNumber++;
+//				}
+//				//GUILayout.BeginVertical ();
+//				float w = (ParametersRect.width / (paramsPerLine+1)) * ((i%paramsPerLine)+1) - 8;
+//				Rect sliderRect = new Rect (w, 30+((25+80)*(lineNumber-1)), 16, 80);
+//				Parameters[i] = GUI.VerticalSlider(sliderRect, Parameters[i], 1f, 0f);
+//				GUIStyle whiteText = new GUIStyle ();
+//				whiteText.normal.textColor = Color.white;
+//				whiteText.wordWrap = true;
+//				string val = Parameters [i].ToString ();
+//				if (val.Length > 3) {
+//					val = val.Substring (0, 3);
+//				}
+//				GUI.Label (new Rect (sliderRect.x, sliderRect.y + sliderRect.height + 5, (ParametersRect.width / (paramsPerLine+1))-8, 15), val, whiteText);
+//
+//				whiteText.wordWrap = false;
+//				whiteText.clipping = TextClipping.Overflow;
+//				GUIUtility.RotateAroundPivot (-90, new Vector2 (sliderRect.x, sliderRect.y+sliderRect.height));
+//				GUI.Label (new Rect (sliderRect.x, sliderRect.y+sliderRect.height-15, 80, 30), "Parameter " + i.ToString () + ".", whiteText);
+//				GUI.matrix = Matrix4x4.identity;
+//
+//				//GUILayout.EndVertical ();
+//			}
+			// SECOND TRY !
+			GUILayout.BeginVertical();
+			GUIStyle whiteText = new GUIStyle ();
+			whiteText.normal.textColor = Color.white;
 			for (int i = 0; i < Parameters.Count; i++) {
-				GUILayout.BeginVertical ();
-				float w = (ParametersRect.width / (Parameters.Count+1)) * (i+1) - 8;
-				Rect sliderRect = new Rect (w, 30, 16, 80);
-				Parameters[i] = GUI.VerticalSlider(sliderRect, Parameters[i], 1f, 0f);
-				GUIStyle whiteText = new GUIStyle ();
-				whiteText.normal.textColor = Color.white;
-				whiteText.wordWrap = true;
-				string val = Parameters [i].ToString ();
-				if (val.Length > 3) {
-					val = val.Substring (0, 3);
-				}
-				GUI.Label (new Rect (sliderRect.x, sliderRect.y + sliderRect.height + 5, (ParametersRect.width / (Parameters.Count+1))-8, 15), val, whiteText);
-				GUILayout.EndVertical ();
+				GUILayout.BeginHorizontal ();
+				Rect sliderRect = new Rect (margin, 15 + 30 * (i + 1), ParametersRect.width - (margin * 2 + 35), 15);
+				Parameters [i] = EditorGUI.FloatField (new Rect (sliderRect.x + margin + sliderRect.width, sliderRect.y, ParametersRect.width - sliderRect.width - margin*3, sliderRect.height), Parameters [i]);
+				GUILayout.EndHorizontal ();
+				Rect labelRect = new Rect (sliderRect.x, sliderRect.y - 10, sliderRect.width, sliderRect.height);
+				GUI.Label (labelRect, "Parameter " + i.ToString (), whiteText);
+				Parameters [i] = GUI.HorizontalSlider (sliderRect, Parameters [i], 0f, 1f);
 			}
+			GUILayout.EndVertical ();
+
 			GUILayout.EndHorizontal ();
 		}
-		//testParam = EditorGUI.Slider (new Rect (margin, 30, ParametersRect.width - (margin * 2), 20), testParam, 0, 1);
-		//testParam = EditorGUILayout.Knob(new Vector2(40, 40), testParam, 0f, 1f, "", Color.black, new Color(247/255f,148/255f,30/255f), true);
 		GUILayout.EndArea ();
 
 		ProcessEvents (e);
@@ -103,7 +137,6 @@ public class BAMF_NodePropertyView : BAMF_ViewBase {
 		if (e.type == EventType.MouseUp) {
 			isGrabbing = false;
 		}
-
 		if (isGrabbing) {
 			EditorGUIUtility.AddCursorRect (new Rect(e.mousePosition.x-50, e.mousePosition.y-50,100,100), MouseCursor.ResizeVertical);
 			StatesRect.height = viewRect.height*(e.mousePosition.y / viewRect.height)-StatesRect.y;
@@ -114,5 +147,12 @@ public class BAMF_NodePropertyView : BAMF_ViewBase {
 	#endregion
 
 	#region utility methods
+	#endregion
+
+	#region subclasses
+	public class BAMF_Parameter{
+		public float value;
+		public string name;
+	}
 	#endregion
 }
