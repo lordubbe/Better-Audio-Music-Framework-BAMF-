@@ -15,6 +15,7 @@ public class BAMF_ViewBase {
 	#region protected variables
 	protected GUISkin viewSkin;
 	protected BAMF_NodeGraph currentGraph;
+	protected BAMF_GameStatesAndParameters currentGameInfo;
 	#endregion
 
 	#region Constructors
@@ -29,7 +30,7 @@ public class BAMF_ViewBase {
 	}
 
 	#region main methods
-	public virtual void UpdateView(Rect editorRect, Rect percentageRect, Event e, BAMF_NodeGraph currentGraph){
+	public virtual void UpdateView(Rect editorRect, Rect percentageRect, Event e, BAMF_NodeGraph currentGraph, BAMF_GameStatesAndParameters currentGameInfo){
 
 		if (viewSkin == null) {
 			GetEditorSkin ();
@@ -37,6 +38,7 @@ public class BAMF_ViewBase {
 		}
 		//set the current view graph
 		this.currentGraph = currentGraph;
+		this.currentGameInfo = currentGameInfo;
 
 		//update view rect
 		viewRect = new Rect (editorRect.x * percentageRect.x, editorRect.y * percentageRect.y, editorRect.width * percentageRect.width, editorRect.height * percentageRect.height);

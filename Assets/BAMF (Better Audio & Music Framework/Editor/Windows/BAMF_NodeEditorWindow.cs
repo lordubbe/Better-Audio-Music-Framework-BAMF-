@@ -10,6 +10,7 @@ public class BAMF_NodeEditorWindow : EditorWindow {
 	public BAMF_NodeWorkView workView;
 
 	public BAMF_NodeGraph currentGraph = null;
+	public BAMF_GameStatesAndParameters currentGameInfo = null;
 
 	public float viewPercentage = 0.75f;
 
@@ -25,18 +26,6 @@ public class BAMF_NodeEditorWindow : EditorWindow {
 		CreateViews ();
 	}
 
-	void OnEnable(){
-		
-	}
-
-	void OnDestroy(){
-		
-	}
-
-	void Update(){
-
-	}
-
 	void OnGUI(){
 		//make sure that if the views are randomly lost, we recreate them!
 		if (propertyView == null || workView == null) {
@@ -50,8 +39,8 @@ public class BAMF_NodeEditorWindow : EditorWindow {
 
 		//Update views
 		viewPercentageGrabber = new Rect(position.width*viewPercentage, 0f, 5, position.height);
-		workView.UpdateView (position, new Rect(0f, 0f, viewPercentage, 1f), e, currentGraph);
-		propertyView.UpdateView (new Rect(position.width, position.y, position.width, position.height), new Rect(viewPercentage, 0f, 1f-viewPercentage, 1f), e, currentGraph);
+		workView.UpdateView (position, new Rect(0f, 0f, viewPercentage, 1f), e, currentGraph, currentGameInfo);
+		propertyView.UpdateView (new Rect(position.width, position.y, position.width, position.height), new Rect(viewPercentage, 0f, 1f-viewPercentage, 1f), e, currentGraph, currentGameInfo);
 		ProcessEvents (e);
 		Repaint ();
 	}
@@ -63,7 +52,7 @@ public class BAMF_NodeEditorWindow : EditorWindow {
 			currentWindow.propertyView = new BAMF_NodePropertyView ();
 			currentWindow.workView = new BAMF_NodeWorkView ();
 		} else {
-			currentWindow = EditorWindow.GetWindow<BAMF_NodeEditorWindow> () as BAMF_NodeEditorWindow;
+			currentWindow = EditorWindow.GetWindow<BAMF_NodeEditorWindow> () as BAMF_NodeEditorWindow; 
 		}
 	}
 

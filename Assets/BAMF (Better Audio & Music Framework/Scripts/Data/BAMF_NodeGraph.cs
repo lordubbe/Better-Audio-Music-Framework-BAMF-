@@ -1,4 +1,4 @@
-﻿	using UnityEngine;
+﻿using UnityEngine;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -13,7 +13,6 @@ public class BAMF_NodeGraph : ScriptableObject {
 	public BAMF_NodeBase selectedNode;
 	public int amountSelected;
 	public bool multiSelected;
-
 	public bool connectionMode = false;
 	public BAMF_NodeBase clickedNode = null;
 	public int clickedNodeOutputID;

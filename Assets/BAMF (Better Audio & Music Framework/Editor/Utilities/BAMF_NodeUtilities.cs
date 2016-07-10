@@ -3,7 +3,26 @@ using UnityEditor;
 using System.Collections;
 
 public static class BAMF_NodeUtilities {
-	
+
+	public static void CreateNewGameInfo(string name){
+		BAMF_GameStatesAndParameters currentInfo = ScriptableObject.CreateInstance<BAMF_GameStatesAndParameters> () as BAMF_GameStatesAndParameters;
+		if (currentInfo != null) {
+			currentInfo.name = name;
+			currentInfo.InitInfo ();
+
+			AssetDatabase.CreateAsset (currentInfo, "Assets/BAMF (Better Audio & Music Framework/Database/" + name + ".asset");
+			AssetDatabase.SaveAssets ();
+			AssetDatabase.Refresh ();
+
+			BAMF_NodeEditorWindow currentWindow = EditorWindow.GetWindow<BAMF_NodeEditorWindow> () as BAMF_NodeEditorWindow;
+			if (currentWindow != null) {
+				currentWindow.currentGameInfo = currentInfo;
+			}
+		} else {
+			EditorUtility.DisplayDialog ("Whoops!", "Unable to create new game info. Sorry.", "OK");
+		}
+	}
+
 	public static void CreateNewGraph(string name){
 
 		BAMF_NodeGraph currentGraph = ScriptableObject.CreateInstance<BAMF_NodeGraph> () as BAMF_NodeGraph;
@@ -43,10 +62,25 @@ public static class BAMF_NodeUtilities {
 				currentWindow.currentGraph = currentGraph;
 			}
 		} else {
-			EditorUtility.DisplayDialog ("Node Messag", "Unable to load selected Graph :(", "OK");
+			EditorUtility.DisplayDialog ("ERROR:", "Unable to load selected item (not a graph?)", "OK");
 		}
 	}
 
+	public static void LoadGameInfo(){
+		BAMF_GameStatesAndParameters currentInfo = null;
+		string graphPath = EditorUtility.OpenFilePanel("Load Game States & Parameters", Application.dataPath + "/BAMF (Better Audio & Music Framework/Database/Database", "");
+		int appPathLength = Application.dataPath.Length;
+		string finalPath = graphPath.Substring (appPathLength - 6); 
+		currentInfo = AssetDatabase.LoadAssetAtPath (finalPath, typeof(BAMF_GameStatesAndParameters)) as BAMF_GameStatesAndParameters;
+		if (currentInfo != null) {
+			BAMF_NodeEditorWindow currentWindow = EditorWindow.GetWindow<BAMF_NodeEditorWindow> () as BAMF_NodeEditorWindow;
+			if (currentWindow != null) {
+				currentWindow.currentGameInfo = currentInfo;
+			}
+		} else {
+			EditorUtility.DisplayDialog ("ERROR:", "Unable to load selected item (not Game States & Parameters?)", "OK");
+		}
+	}
 
 	//NODES
 	public static void CreateNode(BAMF_NodeGraph currentGraph, NodeType nodeType, Vector2 mousePos){

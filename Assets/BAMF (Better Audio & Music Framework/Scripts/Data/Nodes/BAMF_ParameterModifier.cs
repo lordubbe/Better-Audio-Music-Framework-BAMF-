@@ -8,6 +8,8 @@ public class BAMF_ParameterModifier : BAMF_NodeBase {
 
 	public AnimationCurve curve;
 	public ParameterModifierType type;
+	public BAMF_Parameter parameter;
+	int selectedParameter = 0;
 
 	public override void InitNode(){
 		base.InitNode ();
@@ -47,7 +49,21 @@ public class BAMF_ParameterModifier : BAMF_NodeBase {
 		GUILayout.BeginHorizontal ();
 		GUILayout.Space (5);
 		type = (ParameterModifierType) EditorGUILayout.EnumPopup (type);
-		type = (ParameterModifierType) EditorGUILayout.EnumPopup (type);
+
+		BAMF_Parameter[] paramz = ScriptableObject.FindObjectsOfType<BAMF_Parameter>();
+		string[] paramStrings = new string[paramz.Length];
+		if (paramz != null) {
+			for (int i = 0; i < paramz.Length; i++) {
+				paramStrings [i] = paramz [i].name;
+			}
+			selectedParameter = EditorGUILayout.Popup (selectedParameter, paramStrings);
+			parameter = paramz [selectedParameter];
+		}
+
+		if (parameter != null) {
+			EditorGUI.DrawRect (new Rect (5 + parameter.value * (contentRect.width - 10), 5+1, 1, 37), Color.white);
+		}
+
 		GUILayout.Space (5);
 		GUILayout.EndHorizontal ();
 		GUILayout.EndArea ();

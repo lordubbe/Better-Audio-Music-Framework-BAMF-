@@ -29,9 +29,9 @@ public class BAMF_NodeWorkView : BAMF_ViewBase {
 	#endregion
 
 	#region main methods
-	public override void UpdateView (Rect editorRect, Rect percentageRect, Event e, BAMF_NodeGraph currentGraph)
+	public override void UpdateView (Rect editorRect, Rect percentageRect, Event e, BAMF_NodeGraph currentGraph, BAMF_GameStatesAndParameters currentGameInfo)
 	{
-		base.UpdateView (editorRect, percentageRect, e, currentGraph);
+		base.UpdateView (editorRect, percentageRect, e, currentGraph, currentGameInfo);
 		if (currentGraph != null) {
 			viewTitle = currentGraph.graphName;
 		} else {
@@ -44,59 +44,70 @@ public class BAMF_NodeWorkView : BAMF_ViewBase {
 		} else {
 			//TODO: draw drag & drop screen here
 		}
-		GUILayout.BeginArea (viewRect); //actual workspace view
 
 		if (currentGraph != null) {
-			currentGraph.UpdateGraphGUI (e, viewRect, viewSkin );
-		}
 
-		if (multiSelect) {
-			multiSelectEndPos = Event.current.mousePosition;
-			Rect selection = new Rect (multiSelectStartPos.x, multiSelectStartPos.y, multiSelectEndPos.x - multiSelectStartPos.x, multiSelectEndPos.y - multiSelectStartPos.y);
-			EditorGUI.DrawRect (selection, new Color (1, 1, 1, 0.2f));
-			for (int i = 0; i < currentGraph.nodes.Count; i++) {
-				if (!currentGraph.nodes [i].isSelected) {
-					for (float x = multiSelectStartPos.x; x < multiSelectEndPos.x; x += 10) {
-						for (float y = multiSelectStartPos.y; y < multiSelectEndPos.y; y += 10) {
-							if (currentGraph.nodes [i].nodeRect.Contains (new Vector2 (x, y))) {
-								currentGraph.nodes [i].isSelected = true;
-								currentGraph.nodes [i].canMove = false;
-							}
-						}
-					}
-				} else {
-					bool stillSelected = false;
-					for (float x = multiSelectStartPos.x; x < multiSelectEndPos.x; x += 10) {
-						for (float y = multiSelectStartPos.y; y < multiSelectEndPos.y; y += 10) {
-							if (currentGraph.nodes [i].nodeRect.Contains (new Vector2 (x, y))) {
-								stillSelected = true;
-							}
-						}
-					}
-					if (!stillSelected) {
-						currentGraph.nodes [i].isSelected = false;
-						currentGraph.nodes [i].canMove = true;
-					}
+			GUILayout.BeginArea (viewRect); //actual workspace view
+
+			currentGraph.UpdateGraphGUI (e, viewRect, viewSkin);
+
+			if (multiSelect) {
+				multiSelectEndPos = Event.current.mousePosition;
+				Rect selection = new Rect (multiSelectStartPos.x, multiSelectStartPos.y, multiSelectEndPos.x - multiSelectStartPos.x, multiSelectEndPos.y - multiSelectStartPos.y);
+				if (selection.width < 0) {
+					selection.x = multiSelectEndPos.x; selection.width = -1 * selection.width;
 				}
-			}
-		} else {
-			if (currentGraph != null) {
-				currentGraph.amountSelected = 0;
+				if (selection.height < 0) {
+					selection.y = multiSelectEndPos.y; selection.height = -1 * selection.height;
+				}
+				EditorGUI.DrawRect (selection, new Color (1, 1, 1, 0.2f));
+//				float xSign = -1*(multiSelectStartPos.x - multiSelectEndPos.x);
+//				float ySign = -1*(multiSelectStartPos.y - multiSelectEndPos.y);
 				for (int i = 0; i < currentGraph.nodes.Count; i++) {
-					if (currentGraph.nodes [i].isSelected) {
-						currentGraph.amountSelected++;
+					if (!currentGraph.nodes [i].isSelected) {
+						for (float x = selection.x; x < selection.x+selection.width; x += 10) {
+							for (float y = selection.y; y < selection.y+selection.height; y += 10) {
+								if (currentGraph.nodes [i].nodeRect.Contains (new Vector2 (x, y))) {
+									currentGraph.nodes [i].isSelected = true;
+									currentGraph.nodes [i].canMove = false;
+								}
+							}
+						}
+					} else {
+						bool stillSelected = false;
+						for (float x = selection.x; x < selection.x+selection.width; x += 10) {
+							for (float y = selection.y; y < selection.y+selection.height; y += 10) {
+								if (currentGraph.nodes [i].nodeRect.Contains (new Vector2 (x, y))) {
+									stillSelected = true;
+								}
+							}
+						}
+						if (!stillSelected) {
+							currentGraph.nodes [i].isSelected = false;
+							currentGraph.nodes [i].canMove = true;
+						}
 					}
 				}
-				if (currentGraph.amountSelected == 0) {
-					currentGraph.multiSelected = false;
+			} else {
+				if (currentGraph != null) {
+					currentGraph.amountSelected = 0;
+					for (int i = 0; i < currentGraph.nodes.Count; i++) {
+						if (currentGraph.nodes [i].isSelected) {
+							currentGraph.amountSelected++;
+						}
+					}
+					if (currentGraph.amountSelected == 0) {
+						currentGraph.multiSelected = false;
+					}
 				}
 			}
+
+
+			GUILayout.EndArea ();
 		}
-
-
-		GUILayout.EndArea ();
 
 		ProcessEvents (e);
+
 		if (draggingworkspace) {
 			EditorGUIUtility.AddCursorRect (new Rect(e.mousePosition.x-50, e.mousePosition.y-50,100,100), MouseCursor.Pan);
 		}
@@ -160,52 +171,49 @@ public class BAMF_NodeWorkView : BAMF_ViewBase {
 					draggingworkspace = false;
 				}
 			}
-
-			if (e.button == 0) { //left click (MULTISELECT)
-				if (e.type == EventType.MouseDown) {
-					mousePos = e.mousePosition;
-					bool overNode = false;
-					int overIdx = 0;
-					if (currentGraph != null) {
-						if (currentGraph.nodes.Count > 0) {
-							for (int i = 0; i < currentGraph.nodes.Count; i++) {
-								if (currentGraph.nodes [i].nodeRect.Contains (mousePos)) {
-									overNode = true;
-									overIdx = i;
+			if(currentGraph != null){
+				if (e.button == 0) { //left click (MULTISELECT)
+					if (e.type == EventType.MouseDown) {
+						mousePos = e.mousePosition;
+						bool overNode = false;
+						int overIdx = 0;
+						if (currentGraph != null) {
+							if (currentGraph.nodes.Count > 0) {
+								for (int i = 0; i < currentGraph.nodes.Count; i++) {
+									if (currentGraph.nodes [i].nodeRect.Contains (mousePos)) {
+										overNode = true;
+										overIdx = i;
+									}
+								}
+							}
+						}
+						if (!overNode) {
+							multiSelectStartPos = mousePos;
+							multiSelectEndPos = mousePos;
+							multiSelect = true;
+							currentGraph.amountSelected = 0;
+						} else {
+							if (!currentGraph.nodes [overIdx].isSelected) {
+								if (e.shift) {
+									currentGraph.multiSelected = true;
+								} else {
+									currentGraph.multiSelected = false;
 								}
 							}
 						}
 					}
-					if (!overNode) {
-						multiSelectStartPos = mousePos;
-						multiSelectEndPos = mousePos;
-						multiSelect = true;
-						currentGraph.amountSelected = 0;
-					} else {
-						if (!currentGraph.nodes [overIdx].isSelected) {
-							if (e.shift) {
-								currentGraph.multiSelected = true;
-							} else {
-								currentGraph.multiSelected = false;
-							}
+
+					if (e.type == EventType.MouseUp) {
+						for (int i = 0; i < currentGraph.nodes.Count; i++) {
+							if (currentGraph.nodes [i].isSelected) {
+								if (multiSelect) {
+									currentGraph.multiSelected = true; 
+								}
+							} 
+							currentGraph.nodes [i].canMove = true;
 						}
+						multiSelect = false;
 					}
-				}
-
-				if (e.type == EventType.MouseDrag) {
-					
-				}
-
-				if (e.type == EventType.MouseUp) {
-					for (int i = 0; i < currentGraph.nodes.Count; i++) {
-						if (currentGraph.nodes [i].isSelected) {
-							if (multiSelect) {
-								currentGraph.multiSelected = true; 
-							}
-						} 
-						currentGraph.nodes [i].canMove = true;
-					}
-					multiSelect = false;
 				}
 			}
 

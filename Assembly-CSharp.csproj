@@ -45,8 +45,11 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+     <Compile Include="Assets\BAMF (Better Audio &amp; Music Framework\Scripts\Data\BAMF_GameStatesAndParameters.cs" />
      <Compile Include="Assets\BAMF (Better Audio &amp; Music Framework\Scripts\Data\BAMF_NodeEnums.cs" />
      <Compile Include="Assets\BAMF (Better Audio &amp; Music Framework\Scripts\Data\BAMF_NodeGraph.cs" />
+     <Compile Include="Assets\BAMF (Better Audio &amp; Music Framework\Scripts\Data\BAMF_Parameter.cs" />
+     <Compile Include="Assets\BAMF (Better Audio &amp; Music Framework\Scripts\Data\BAMF_State.cs" />
      <Compile Include="Assets\BAMF (Better Audio &amp; Music Framework\Scripts\Data\Nodes\BAMF_AddNode.cs" />
      <Compile Include="Assets\BAMF (Better Audio &amp; Music Framework\Scripts\Data\Nodes\BAMF_FloatNode.cs" />
      <Compile Include="Assets\BAMF (Better Audio &amp; Music Framework\Scripts\Data\Nodes\BAMF_MusicNode.cs" />
