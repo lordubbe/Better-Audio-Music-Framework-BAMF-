@@ -10,6 +10,7 @@ public class BAMF_GameStatesAndParameters : ScriptableObject {
 	public string gameInfoInstanceName = "Game Info";
 	public List<BAMF_Parameter> parameters;
 	public List<BAMF_State> states;
+	public bool isCurrentGameInfo = false;
 
 	public void InitInfo(){
 		if (parameters == null) {

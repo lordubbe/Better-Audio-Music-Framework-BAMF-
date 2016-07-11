@@ -162,6 +162,10 @@ public class BAMF_NodeBase : ScriptableObject {//want it to be attached to an as
 
 	}
 
+	public virtual void UpdateParameters(){
+
+	}
+
 	#endregion
 
 

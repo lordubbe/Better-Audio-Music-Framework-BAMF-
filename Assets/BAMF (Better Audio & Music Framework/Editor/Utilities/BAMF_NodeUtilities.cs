@@ -8,6 +8,8 @@ public static class BAMF_NodeUtilities {
 		BAMF_GameStatesAndParameters currentInfo = ScriptableObject.CreateInstance<BAMF_GameStatesAndParameters> () as BAMF_GameStatesAndParameters;
 		if (currentInfo != null) {
 			currentInfo.name = name;
+			setAllInfoNotCurrent ();
+			currentInfo.isCurrentGameInfo = true;
 			currentInfo.InitInfo ();
 
 			AssetDatabase.CreateAsset (currentInfo, "Assets/BAMF (Better Audio & Music Framework/Database/" + name + ".asset");
@@ -39,7 +41,7 @@ public static class BAMF_NodeUtilities {
 				currentWindow.currentGraph = currentGraph;
 			}
 		} else {
-			EditorUtility.DisplayDialog ("Node Message", "Unable to create new graph. Sorry.", "OK");
+			EditorUtility.DisplayDialog ("ERROR:", "Unable to create new graph. Sorry.", "OK");
 		}
 	}
 
@@ -47,6 +49,14 @@ public static class BAMF_NodeUtilities {
 		BAMF_NodeEditorWindow currentWindow = EditorWindow.GetWindow<BAMF_NodeEditorWindow> () as BAMF_NodeEditorWindow;
 		if (currentWindow != null) {
 			currentWindow.currentGraph = null;
+		}
+	}
+
+	public static void UnloadGameInfo(){
+		BAMF_NodeEditorWindow currentWindow = EditorWindow.GetWindow<BAMF_NodeEditorWindow> () as BAMF_NodeEditorWindow;
+		if (currentWindow != null) {
+			setAllInfoNotCurrent ();
+			currentWindow.currentGameInfo = null;
 		}
 	}
 
@@ -75,6 +85,8 @@ public static class BAMF_NodeUtilities {
 		if (currentInfo != null) {
 			BAMF_NodeEditorWindow currentWindow = EditorWindow.GetWindow<BAMF_NodeEditorWindow> () as BAMF_NodeEditorWindow;
 			if (currentWindow != null) {
+				setAllInfoNotCurrent ();
+				currentInfo.isCurrentGameInfo = true;
 				currentWindow.currentGameInfo = currentInfo;
 			}
 		} else {
@@ -117,6 +129,7 @@ public static class BAMF_NodeUtilities {
 				currentNode.nodeRect.x = mousePos.x;
 				currentNode.nodeRect.y = mousePos.y;
 				currentNode.parentGraph = currentGraph;
+				currentNode.name = currentNode.nodeName;
 				currentGraph.nodes.Add (currentNode);
 
 				AssetDatabase.AddObjectToAsset (currentNode, currentGraph);
@@ -150,6 +163,13 @@ public static class BAMF_NodeUtilities {
 					AssetDatabase.Refresh ();
 				}
 			}
+		}
+	}
+
+	public static void setAllInfoNotCurrent(){
+		BAMF_GameStatesAndParameters[] allInfo = ScriptableObject.FindObjectsOfType<BAMF_GameStatesAndParameters> ();
+		for (int i = 0; i < allInfo.Length; i++) {
+			allInfo [i].isCurrentGameInfo = false;
 		}
 	}
 

@@ -22,7 +22,9 @@ public class BAMF_NodePropertyView : BAMF_ViewBase {
 	//program variables
 	bool isGrabbing = false;
 	int selectedState;
-
+	bool renaming = false;
+	int renamingIdx = 0;
+	Rect activeRenamingRect = new Rect(0,0,0,0);
 	#region constructor
 	public BAMF_NodePropertyView () : base ("Game States & Parameters"){}
 	#endregion
@@ -38,8 +40,13 @@ public class BAMF_NodePropertyView : BAMF_ViewBase {
 		base.UpdateView (editorRect, percentageRect, e, currentGraph, currentGameInfo); 
 		GUI.Box (viewRect, viewTitle, viewSkin.GetStyle ("ViewBG"));
 
+		if (e.type == EventType.mouseDown && renaming && !activeRenamingRect.Contains (e.mousePosition)) {
+			renaming = false;
+			activeRenamingRect = new Rect (0, 0, 0, 0);
+		}
+
 		if (currentGameInfo != null) {
-						StatesRect.width = viewRect.width - (2 * margin); 
+			StatesRect.width = viewRect.width - (2 * margin); 
 			StatesRect.x = viewRect.x + margin;
 			GUI.Box (StatesRect, "STATES", viewSkin.GetStyle ("NodeContent"));
 
@@ -112,24 +119,63 @@ public class BAMF_NodePropertyView : BAMF_ViewBase {
 				// SECOND TRY !
 				GUILayout.BeginVertical ();
 				GUIStyle grayText = new GUIStyle ();
-				grayText.normal.textColor = new Color (0.7f, 0.7f, 0.7f, 1);
+				GUIStyle whiteText = new GUIStyle ();
+				whiteText.normal.textColor = Color.white;
+				whiteText.alignment = TextAnchor.MiddleCenter;
+				grayText.normal.textColor = new Color (0.7f, 0.7f, 0.7f, 1); 	
 				for (int i = 0; i < currentGameInfo.parameters.Count; i++) {
 					GUILayout.BeginHorizontal ();
-					Rect sliderRect = new Rect (margin, 15 + 30 * (i + 1), ParametersRect.width - (margin * 2 + 35), 15);
+					Rect sliderRect = new Rect (margin, 15 + 35 * (i + 1), ParametersRect.width - (margin * 2 + 35), 15);
 					GUI.backgroundColor = new Color (247 / 255f, 148 / 255f, 30 / 255f);
 					currentGameInfo.parameters [i].value = EditorGUI.FloatField (new Rect (sliderRect.x + margin + sliderRect.width, sliderRect.y, ParametersRect.width - sliderRect.width - margin * 3, sliderRect.height), currentGameInfo.parameters [i].value);
 					GUILayout.EndHorizontal ();
-					Rect labelRect = new Rect (sliderRect.x, sliderRect.y - 10, sliderRect.width, sliderRect.height);
-					GUI.Label (labelRect, "Parameter " + i.ToString (), grayText);
+					Rect labelRect = new Rect (sliderRect.x, sliderRect.y - 15, sliderRect.width, sliderRect.height);
+					GUI.Label (labelRect, currentGameInfo.parameters[i].name, grayText);
 					currentGameInfo.parameters [i].value = GUI.HorizontalSlider (sliderRect, currentGameInfo.parameters [i].value, 0f, 1f);
 					GUI.backgroundColor = Color.white;
+
+					if (labelRect.Contains (e.mousePosition) && !(renaming && renamingIdx == i)) {
+						EditorGUI.DrawRect (labelRect, new Color (1, 1, 1, 0.1f));
+						Rect renameLabel = labelRect;
+						renameLabel.x = labelRect.width - 50;
+						renameLabel.width = labelRect.width - renameLabel.x+margin;
+						if (renameLabel.Contains (e.mousePosition)) {
+							whiteText.fontStyle = FontStyle.Bold;
+							GUI.Label (renameLabel, "EDIT", whiteText);
+							whiteText.fontStyle = FontStyle.Normal;
+							if (e.type == EventType.MouseDown && e.button == 0) {
+								//renaming = true;
+								ProcessContextMenu (e, 1);
+								renamingIdx = i;
+							}
+						} else {
+							GUI.Label (renameLabel, "EDIT", whiteText);
+						}
+					}
+					if (renaming && renamingIdx == i) {
+						activeRenamingRect = labelRect;
+						activeRenamingRect.x = labelRect.x+viewRect.x+margin; activeRenamingRect.y = labelRect.y + ParametersRect.y; 
+						currentGameInfo.parameters [i].name = EditorGUI.TextField (labelRect, currentGameInfo.parameters [i].name);
+						if (e.type == EventType.KeyDown) {
+							if (e.keyCode == KeyCode.Tab || e.keyCode == KeyCode.Return || e.character == '\n' || e.keyCode == KeyCode.KeypadEnter) {
+								renaming = false;
+								renamingIdx = 0;
+							}
+						}
+					}
+
 				}
-				GUILayout.Space (margin*2 + 30 * currentGameInfo.parameters.Count);
+
+
+				GUILayout.Space (margin*2 + 35 * currentGameInfo.parameters.Count);
 				GUILayout.BeginHorizontal ();
 				GUILayout.Space (margin*10);
 				if (GUILayout.Button ("", viewSkin.GetStyle ("DropArea"), GUILayout.MaxHeight (30), GUILayout.MaxWidth (120))) {
-					BAMF_Parameter p = new BAMF_Parameter (0f, "Parameter " + currentGameInfo.parameters.Count.ToString ());
+					BAMF_Parameter p = ScriptableObject.CreateInstance<BAMF_Parameter> () as BAMF_Parameter;
+					p.name = "Parameter " + currentGameInfo.parameters.Count.ToString ();
+					p.value = 0f;
 					currentGameInfo.parameters.Add (p);
+					// HERE
 				}
 				GUILayout.Space (margin*10);
 				GUILayout.EndHorizontal ();
@@ -139,13 +185,21 @@ public class BAMF_NodePropertyView : BAMF_ViewBase {
 				GUILayout.EndHorizontal ();
 			}
 			GUILayout.EndArea ();
-
 			ProcessEvents (e);
 		} else {
 			if (viewRect.Contains (e.mousePosition)) {
 				if (e.button == 1) {//right click
 					if (e.type == EventType.MouseDown) {
-						ProcessContextMenu (e);
+						ProcessContextMenu (e, 0);
+					}
+				}
+			}
+		}
+		if (currentGameInfo != null) {
+			if (viewRect.Contains (e.mousePosition)) {
+				if (e.button == 1) {//right click
+					if (e.type == EventType.MouseDown) {
+						ProcessContextMenu (e, 0);
 					}
 				}
 			}
@@ -179,10 +233,27 @@ public class BAMF_NodePropertyView : BAMF_ViewBase {
 	#endregion
 
 	#region utility methods
-	void ProcessContextMenu(Event e){
+	void ProcessContextMenu(Event e, int id){
 		GenericMenu menu = new GenericMenu ();
-		menu.AddItem (new GUIContent ("Create New Game Info Instance"), false, ContextCallback, "newGameInfo");
-		menu.AddItem (new GUIContent ("Load Game Info Instance"), false, ContextCallback, "loadGameInfo");
+		switch (id) {
+		case 0:
+			//game info loading/creation
+			if (currentGameInfo != null) {
+				menu.AddItem (new GUIContent ("Unload Current Game Info"), false, ContextCallback, "unloadCurrentGameInfo");
+			}
+			menu.AddItem (new GUIContent ("Create New Game Info Instance"), false, ContextCallback, "newGameInfo");
+			menu.AddItem (new GUIContent ("Load Game Info Instance"), false, ContextCallback, "loadGameInfo");
+			break;
+		case 1:
+			//parameter editing
+			menu.AddItem (new GUIContent ("Rename Parameter"), false, ContextCallback, "renameParameter");
+			menu.AddItem (new GUIContent ("Delete Parameter"), false, ContextCallback, "deleteParameter");
+			break;
+		default:
+			//
+			break;
+		}
+
 		menu.ShowAsContext ();
 		e.Use ();
 	}
@@ -194,6 +265,25 @@ public class BAMF_NodePropertyView : BAMF_ViewBase {
 			break;
 		case "loadGameInfo":
 			BAMF_NodeUtilities.LoadGameInfo ();
+			break;
+		case "unloadCurrentGameInfo":
+			BAMF_NodeUtilities.UnloadGameInfo ();
+			break;
+		case "renameParameter":
+			//
+			renaming = true;
+			break;
+		case "deleteParameter":
+			renaming = false;
+			if (currentGraph != null) {
+				for (int i = 0; i < currentGraph.nodes.Count; i++) {
+					if (currentGraph.nodes [i].nodeType == NodeType.ParameterModifier) {
+						currentGraph.nodes [i].UpdateParameters ();
+					}
+				}
+			}
+			currentGameInfo.parameters.RemoveAt (renamingIdx);
+			//
 			break;
 		default:
 			//
