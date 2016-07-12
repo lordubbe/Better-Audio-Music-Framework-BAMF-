@@ -104,10 +104,47 @@ public class BAMF_MusicNode : BAMF_NodeBase {
 				EditorGUI.DrawRect (fromPost, new Color (0, 0, 0, 0.5f));
 				EditorGUI.DrawRect (post, new Color(1,0,0,0.5f));
 
+				//draw parameter values
+				if (inputs [i].isOccupied) {
+					if (inputs [i].connectedNode.nodeType == NodeType.ParameterModifier) {
+						float val = inputs [i].connectedNode.EvaluateParameterValue ();
+						Rect paramRect = new Rect (layers [i].prevRect.x, layers [i].prevRect.y + (layers [i].prevRect.height * (1 - val)), layers [i].prevRect.width, 1);
+
+						// Determine color from type
+						Color c = Color.white;
+						switch (inputs [i].connectedNode.GetModifierType ()) {
+						case ParameterModifierType.Volume:
+							c = Color.white;
+							break;
+						case ParameterModifierType.LowPass:
+							c = Color.cyan;
+							break;
+						case ParameterModifierType.HighPass:
+							c = Color.yellow;
+							break;
+						default: 
+							c = Color.white;
+							break;
+						}
+						EditorGUI.DrawRect (paramRect, c);
+						Rect paramHighlight = paramRect;
+						paramHighlight.y = paramRect.y - 2;
+						paramHighlight.height = 5;
+						if (paramHighlight.Contains (e.mousePosition)) {
+							EditorGUI.DrawRect (paramHighlight, new Color (1, 1, 1, 0.2f));
+							GUIStyle whiteText = new GUIStyle ();
+							whiteText.normal.textColor = c;
+							whiteText.fontStyle = FontStyle.Bold;
+							whiteText.alignment = TextAnchor.UpperRight;
+							GUI.Label (paramRect, inputs[i].connectedNode.GetModifierType().ToString(), whiteText);
+						}
+					}
+				}
+
 				layers [i].prevRect.x += nodeRect.x;
 				layers [i].prevRect.y += nodeRect.y+30;
 				layers [i].layerNumber = i;
-				
+
 				GUILayout.Space (thisRect.height); //make space for next layer
 			}
 

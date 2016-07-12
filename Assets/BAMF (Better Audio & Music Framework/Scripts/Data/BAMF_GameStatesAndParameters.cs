@@ -20,4 +20,8 @@ public class BAMF_GameStatesAndParameters : ScriptableObject {
 			states = new List<BAMF_State> ();
 		}
 	}
+
+	public void UpdateGameInfo(){
+		EditorUtility.SetDirty (this);//save changes to the scriptable object as it is changed in the editorwindow
+	}
 }

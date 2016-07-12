@@ -154,6 +154,7 @@ public class BAMF_NodeBase : ScriptableObject {//want it to be attached to an as
 		}
 	}
 
+	//Music Piece
 	public virtual List<BAMF_MusicNode.BAMF_MusicClip> GetLayers(){
 		return null;
 	}
@@ -162,8 +163,17 @@ public class BAMF_NodeBase : ScriptableObject {//want it to be attached to an as
 
 	}
 
-	public virtual void UpdateParameters(){
+	//Parameter Modifier
+	public virtual void UpdateParameters(){}
 
+	public virtual float GetParameterValue(){
+		return 0f;
+	}
+	public virtual float EvaluateParameterValue(){
+		return 0f;
+	}
+	public virtual ParameterModifierType GetModifierType(){
+		return ParameterModifierType.Volume;
 	}
 
 	#endregion

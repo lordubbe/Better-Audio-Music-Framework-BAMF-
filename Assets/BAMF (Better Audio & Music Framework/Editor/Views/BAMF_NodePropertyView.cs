@@ -24,6 +24,8 @@ public class BAMF_NodePropertyView : BAMF_ViewBase {
 	int selectedState;
 	bool renaming = false;
 	int renamingIdx = 0;
+	bool overParameter = false;
+
 	Rect activeRenamingRect = new Rect(0,0,0,0);
 	#region constructor
 	public BAMF_NodePropertyView () : base ("Game States & Parameters"){}
@@ -46,6 +48,9 @@ public class BAMF_NodePropertyView : BAMF_ViewBase {
 		}
 
 		if (currentGameInfo != null) {
+
+			currentGameInfo.UpdateGameInfo ();
+
 			StatesRect.width = viewRect.width - (2 * margin); 
 			StatesRect.x = viewRect.x + margin;
 			GUI.Box (StatesRect, "STATES", viewSkin.GetStyle ("NodeContent"));
@@ -117,6 +122,7 @@ public class BAMF_NodePropertyView : BAMF_ViewBase {
 //				//GUILayout.EndVertical ();
 //			}
 				// SECOND TRY !
+				overParameter = false;
 				GUILayout.BeginVertical ();
 				GUIStyle grayText = new GUIStyle ();
 				GUIStyle whiteText = new GUIStyle ();
@@ -140,10 +146,11 @@ public class BAMF_NodePropertyView : BAMF_ViewBase {
 						renameLabel.x = labelRect.width - 50;
 						renameLabel.width = labelRect.width - renameLabel.x+margin;
 						if (renameLabel.Contains (e.mousePosition)) {
+							overParameter = true;
 							whiteText.fontStyle = FontStyle.Bold;
 							GUI.Label (renameLabel, "EDIT", whiteText);
 							whiteText.fontStyle = FontStyle.Normal;
-							if (e.type == EventType.MouseDown && e.button == 0) {
+							if (e.type == EventType.MouseDown && (e.button == 0 || e.button == 1)) {
 								//renaming = true;
 								ProcessContextMenu (e, 1);
 								renamingIdx = i;
@@ -166,16 +173,11 @@ public class BAMF_NodePropertyView : BAMF_ViewBase {
 
 				}
 
-
 				GUILayout.Space (margin*2 + 35 * currentGameInfo.parameters.Count);
 				GUILayout.BeginHorizontal ();
 				GUILayout.Space (margin*10);
 				if (GUILayout.Button ("", viewSkin.GetStyle ("DropArea"), GUILayout.MaxHeight (30), GUILayout.MaxWidth (120))) {
-					BAMF_Parameter p = ScriptableObject.CreateInstance<BAMF_Parameter> () as BAMF_Parameter;
-					p.name = "Parameter " + currentGameInfo.parameters.Count.ToString ();
-					p.value = 0f;
-					currentGameInfo.parameters.Add (p);
-					// HERE
+					BAMF_NodeUtilities.CreateParameter (currentGameInfo);
 				}
 				GUILayout.Space (margin*10);
 				GUILayout.EndHorizontal ();
@@ -187,7 +189,7 @@ public class BAMF_NodePropertyView : BAMF_ViewBase {
 			GUILayout.EndArea ();
 			ProcessEvents (e);
 		} else {
-			if (viewRect.Contains (e.mousePosition)) {
+			if (viewRect.Contains (e.mousePosition) && !overParameter) {
 				if (e.button == 1) {//right click
 					if (e.type == EventType.MouseDown) {
 						ProcessContextMenu (e, 0);
@@ -196,7 +198,7 @@ public class BAMF_NodePropertyView : BAMF_ViewBase {
 			}
 		}
 		if (currentGameInfo != null) {
-			if (viewRect.Contains (e.mousePosition)) {
+			if (viewRect.Contains (e.mousePosition) && !overParameter) {
 				if (e.button == 1) {//right click
 					if (e.type == EventType.MouseDown) {
 						ProcessContextMenu (e, 0);

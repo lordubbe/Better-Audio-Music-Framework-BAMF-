@@ -94,6 +94,30 @@ public static class BAMF_NodeUtilities {
 		}
 	}
 
+	public static void CreateParameter(BAMF_GameStatesAndParameters currentInfo){
+		if (currentInfo != null) {
+			BAMF_Parameter p = ScriptableObject.CreateInstance<BAMF_Parameter> () as BAMF_Parameter;
+			p.name = "Parameter " + currentInfo.parameters.Count.ToString ();
+			p.value = 0f;
+			currentInfo.parameters.Add (p);
+			AssetDatabase.AddObjectToAsset (p, currentInfo);
+			AssetDatabase.SaveAssets ();
+			AssetDatabase.Refresh ();
+		}
+	}
+
+	public static void CreateState(BAMF_GameStatesAndParameters currentInfo){
+		if (currentInfo != null) {
+			BAMF_State s = ScriptableObject.CreateInstance<BAMF_State> () as BAMF_State;
+			s.name = "State " + currentInfo.states.Count.ToString ();
+			s.isActive = false;
+			currentInfo.states.Add (s);
+			AssetDatabase.AddObjectToAsset (s, currentInfo);
+			AssetDatabase.SaveAssets ();
+			AssetDatabase.Refresh ();
+		}
+	}
+
 	//NODES
 	public static void CreateNode(BAMF_NodeGraph currentGraph, NodeType nodeType, Vector2 mousePos){
 		if (currentGraph != null) {
@@ -111,13 +135,14 @@ public static class BAMF_NodeUtilities {
 			case NodeType.Music:
 				//
 				currentNode = ScriptableObject.CreateInstance<BAMF_MusicNode> () as BAMF_MusicNode;
-				//currentNode.nodeName = nodeType.ToString () + " Node";
-				currentNode.nodeName = "M U S I C  P I E C E"; 
+				//currentNode.nodeName = "M U S I C  P I E C E"; 
+				currentNode.nodeName = "Music Piece"; 
 				break;
 			case NodeType.ParameterModifier:
 				//
 				currentNode = ScriptableObject.CreateInstance<BAMF_ParameterModifier> () as BAMF_ParameterModifier;
-				currentNode.nodeName = "P A R A M E T E R";
+				//currentNode.nodeName = "P A R A M E T E R";
+				currentNode.nodeName = "Parameter Modifier";
 				break;
 			default: 
 				//

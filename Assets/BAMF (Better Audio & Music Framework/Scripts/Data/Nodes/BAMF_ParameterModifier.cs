@@ -61,14 +61,12 @@ public class BAMF_ParameterModifier : BAMF_NodeBase {
 				possibleParameters = gameInfo.parameters;
 			}
 		}
-		if (possibleParameters != null && selectedParameter >= possibleParameters.Count) {
-			Debug.Log (selectedParameter+", but count is: "+possibleParameters.Count+"... "+parameter.value);
-		}
+
 		if (possibleParameters != null && possibleParameters.Count > 0 && selectedParameter != null) {
 			string[] paramStrings = new string[possibleParameters.Count];
-			for (int i = 0; i < possibleParameters.Count; i++) {
+			for (int i = 0; i < paramStrings.Length; i++) {
 				paramStrings [i] = possibleParameters [i].name;
-			}
+			} 
 			selectedParameter = EditorGUILayout.Popup (selectedParameter, paramStrings);
 
 			if (possibleParameters != null && possibleParameters.Count > 0 && selectedParameter != null && selectedParameter < possibleParameters.Count) {
@@ -116,6 +114,31 @@ public class BAMF_ParameterModifier : BAMF_NodeBase {
 				}
 			}
 		}
+	}
+
+	public override float GetParameterValue ()
+	{
+		if (parameter != null && parameter.value != null) {
+			return parameter.value;
+		} else {
+			return 0f;
+		}
+	}
+
+	public override float EvaluateParameterValue ()
+	{
+		if (parameter != null && parameter.value != null) {
+			float v = curve.Evaluate (parameter.value);
+			v = Mathf.Clamp (v, 0f, 1f);
+			return v;
+		} else {
+			return 0f;
+		}
+	}
+
+	public override ParameterModifierType GetModifierType ()
+	{
+		return type;
 	}
 	#endif
 }
