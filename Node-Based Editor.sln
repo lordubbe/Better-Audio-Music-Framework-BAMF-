@@ -1,9 +1,9 @@
+﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual Studio 2008
-
-Project("{7D06218A-9FE2-A0FF-19BB-C6D3972052A6}") = "Node-Based Editor", "Assembly-CSharp.csproj", "{82F7B2C5-30DD-FB1F-38E2-258BA6F0EEAE}"
+# Visual Studio 2010
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Node-Based Editor", "Assembly-CSharp.csproj", "{82F7B2C5-30DD-FB1F-38E2-258BA6F0EEAE}"
 EndProject
-Project("{7D06218A-9FE2-A0FF-19BB-C6D3972052A6}") = "Node-Based Editor", "Assembly-CSharp-Editor.csproj", "{7B906CAC-F51A-0172-5C2A-602774EDFCF7}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Node-Based Editor", "Assembly-CSharp-Editor.csproj", "{7B906CAC-F51A-0172-5C2A-602774EDFCF7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
